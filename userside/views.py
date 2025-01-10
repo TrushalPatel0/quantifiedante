@@ -263,7 +263,9 @@ def broker_login(request):
 
 
 def callback(request):
-    user_id = '6762e68e7894a01d32c51a28'
+    user_id = 1
+    if user_id:
+        user_instance = User.objects.get(user_id = user_id)
     code = request.GET.get("code")
     renew_access_token = request.GET.get('renew_access_token')
     if not code:
@@ -285,7 +287,9 @@ def callback(request):
             print("not getting token data")
         else:
             access_token = token_data['access_token']
-            print(access_token)
+            current_time = datetime.now()  # Set to the specified date
+            expiration_time = current_time + timedelta(seconds=3600)
+            store_access_token = Access_Token.objects.create(user_id = user_instance, access_token = access_token, expiry_at = expiration_time)
 
     if renew_access_token:
         url = "https://live.tradovateapi.com/v1/auth/renewAccessToken"
@@ -293,22 +297,17 @@ def callback(request):
         headers = {
             'Authorization': f"Bearer {access_token}"
         }
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        renewed_token = response.json()
+        current_time = datetime.now()  # Set to the specified date
+        expiration_time = current_time + timedelta(seconds=3600)
+
+        if datetime.now() > expiration_time:
+                response = requests.get(url, headers=headers)
+                response.raise_for_status()
+                renewed_token = response.json()
 
     return render(request, 'index.html')
 
-    
-
-
-
 # def refresh_access_token(access_token):
-
-
-        
-
-
 
 
 # def brokerLogin():

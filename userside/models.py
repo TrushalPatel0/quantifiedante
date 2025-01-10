@@ -49,9 +49,8 @@ class Access_Token(models.Model):
     user_preference = models.BigAutoField(primary_key=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     access_token = models.TextField()
-    refresh_token = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
-    created_at = models.DateTimeField(null=True, blank=True)
+    expiry_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return self.user_id.user_email
