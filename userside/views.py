@@ -17,7 +17,7 @@ TOKEN_URL = "https://live-api.tradovate.com/auth/oauthtoken"
 
 # create new account
 # user login
-# user password change
+# user password change pass
 
 
 def home(request):
