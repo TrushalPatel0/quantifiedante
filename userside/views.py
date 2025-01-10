@@ -7,6 +7,9 @@ import json
 import random
 import json
 from django.core.mail import send_mail
+import requests
+from datetime import timedelta,datetime
+from userside.models import *
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
