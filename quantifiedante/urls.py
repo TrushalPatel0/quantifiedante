@@ -23,4 +23,9 @@ urlpatterns = [
     path('trading_view_signal_webhook_listener', views.trading_view_signal_webhook_listener, name='trading_view_signal_webhook_listener'),
     path('callback', views.callback, name='callback'),
     path('broker_login', views.broker_login, name='broker_login'),
+    path('user_register/', views.user_register, name='user_register'),
+    path('user_login/', views.user_login, name='user_login'),
+    path('user_forgot_password/', views.user_forgot_password, name='user_forgot_password'),
+    path('user_change_password/', views.user_change_password, name='user_change_password'),
+    
 ]

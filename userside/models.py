@@ -1,5 +1,6 @@
 from django.db import models
-
+import random
+import string
 # Create your models here.
 
 # Create your models here.
@@ -14,9 +15,15 @@ class User(models.Model):
     user_gender = models.CharField(max_length=15, null=True, blank=True)
     user_ack = models.BooleanField(default=1, null=True, blank=True)
     user_address = models.TextField(null=True, blank=True)
-    user_passphrase = models.CharField(max_length=100, null=True,blank=True)
+    user_passphrase = models.CharField(max_length=100, null=True, blank=True)
     user_signal_on = models.BooleanField(default=0)
 
+
+    def save(self, *args, **kwargs):
+        if not self.user_passphrase:  # Generate passphrase only if not already set
+            self.user_passphrase = ''.join(random.choices(string.ascii_letters + string.digits, k=16))
+        super().save(*args, **kwargs)
+        
     def __str__(self):
         return self.user_email
 
