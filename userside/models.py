@@ -17,6 +17,7 @@ class User(models.Model):
     user_address = models.TextField(null=True, blank=True)
     user_passphrase = models.CharField(max_length=100, null=True, blank=True)
     user_signal_on = models.BooleanField(default=0)
+    user_tradingview_url = models.TextField(null=True,blank=True)
 
 
     def save(self, *args, **kwargs):
@@ -37,6 +38,13 @@ class User_Preference(models.Model):
     account_type = models.CharField(max_length=100, null=True, blank=True)
     order_size = models.IntegerField(null=True, blank=True)
     time_in_force = models.CharField(max_length=100, null=True, blank=True)
+    order_type = models.CharField(max_length=100, null=True, blank=True)
+    time_in_force = models.CharField(max_length=100, null=True, blank=True)
+    account = models.CharField(max_length=100,null=True,blank=True)
+    # marketorder
+    # limitorder
+    # stoplosslimitorder
+    # takemultipleprofitorder
 
     def __str__(self):
         return self.user_id.user_email

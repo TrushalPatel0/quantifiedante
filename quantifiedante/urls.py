@@ -27,5 +27,8 @@ urlpatterns = [
     path('user_login/', views.user_login, name='user_login'),
     path('user_forgot_password/', views.user_forgot_password, name='user_forgot_password'),
     path('user_change_password/', views.user_change_password, name='user_change_password'),
+    path('tradovate_functionalities_data/', views.tradovate_functionalities_data, name='tradovate_functionalities_data'),
+    path('trade_execution/', views.trade_execution, name='trade_execution'),
+    path('trade_signal_update/', views.trade_signal_update, name='trade_signal_update'),
     
 ]

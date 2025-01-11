@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'userside',
+    'django_celery_beat',
+
 ]
 
 MIDDLEWARE = [
@@ -137,3 +139,14 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'pr3179214@gmail.com'  # Your Gmail email address
 EMAIL_HOST_PASSWORD = 'xadc cwcm uaba ekcs'  # No spaces in the password # Your Gmail App Password (use an app password for security)
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+
+
+
+
+# Celery Configuration Options
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+CELERY_TIMEZONE = "Asia/Kolkata"
+# CELERY_TASK_TRACK_STARTED = True
+# CELERY_TASK_TIME_LIMIT = 30 * 60

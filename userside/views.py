@@ -1,3 +1,4 @@
+import aiohttp
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -11,12 +12,17 @@ import requests
 from datetime import timedelta,datetime
 from userside.models import *
 from django.utils import timezone
+from userside.tradovate_functionalities import *
+from quantifiedante.celery import add
+from userside.tasks import *
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
 REDIRECT_URI = "http://localhost:8000/callback"
 AUTH_URL = "https://trader.tradovate.com/oauth"
 TOKEN_URL = "https://live-api.tradovate.com/auth/oauthtoken"
+URL = "https://demo.tradovateapi.com/v1"
+
 
 # Create a new user account
 @csrf_exempt
@@ -230,40 +236,106 @@ def user_change_password(request):
 # Home view
 def home(request):
     print("Hello, world!")
+    result2 = sub.delay()
+    print(result2)
     return render(request, 'index.html')
+
+
+
+
+def trade_execution(request):
+    user_id = 1
+    if user_id:
+        user_instance = User.objects.get(user_id=user_id)
+        token_data = Access_Token.objects.get(user_id=user_instance)
+    
+    account_info = get_accounts(token_data.access_token)  # HTTP call
+   
+    account_spec = account_info[0]['name']
+    account_id = account_info[0]['id']
+
+    access_token = token_data.access_token
+    
+    prefrencess_data = User_Preference.objects.get(user_id=user_instance)
+    order_qty = prefrencess_data.order_size
+    order_typee = 'Market'
+    order_type = prefrencess_data.account_type
+    # if order_type == 'market_order':
+    #     order_typee = 'Market'
+    # elif order_type == 'limit_order':
+    #     order_typee = 'Limit'
+    # elif order_type == 'stop_loss_limit_order':
+    #     order_typee = 'Market'
+    # elif order_type == 'market_order':
+    #     order_typee = 'Market'
+    is_automated = True
+    data = {'account_spec':account_spec,'account_id':account_id,'access_token':access_token,'order_qty':order_qty,'order_type':order_typee,'is_automated':is_automated}
+    return data
+
 
 
 @csrf_exempt
 def trading_view_signal_webhook_listener(request):
     user_id_from_url = 1
+    user_id_from_webhook = request.GET.get('user_id')
+    user_instance = User.objects.get(user_id=user_id_from_webhook)
+    if user_instance == True:
+        print(user_id_from_webhook)
+        if request.body:
+            webhook_message = json.loads(request.body)
 
-    if request.body:
-        webhook_message = json.loads(request.body)
+            print("Webhook message:", webhook_message)
+            user_passphrase_data = User.objects.get(user_passphrase = webhook_message['passphrase'])
 
-        print("Webhook message:", webhook_message)
-        user_passphrase_data = User.objects.get(user_passphrase = webhook_message['passphrase'])
+            if not user_passphrase_data:
+                return redirect('/')
 
-        if not user_passphrase_data:
-            return redirect('/')
-
-        trading_signal = {
-            "user_id": user_id_from_url,
-            "timestamp": webhook_message["time"],
-            "ticker": webhook_message["ticker"],
-            "action": webhook_message["action"],
-            "tp1Line": webhook_message["tp1Line"],
-            "tp2Line": webhook_message["tp2Line"],
-            "tp3Line": webhook_message["tp3Line"],
-            "slLine": webhook_message["slLine"],
-        }
-        print("====================",trading_signal)
-        
-    return render(request, 'index.html')
+            trading_signal = {
+                "user_id": user_id_from_url,
+                "timestamp": webhook_message["time"],
+                "ticker": webhook_message["ticker"],
+                "action": webhook_message["action"],
+                "tp1Line": webhook_message["tp1Line"],
+                "tp2Line": webhook_message["tp2Line"],
+                "tp3Line": webhook_message["tp3Line"],
+                "slLine": webhook_message["slLine"],
+            }
+            symbol = webhook_message["ticker"]
+            symbol = convert_ticker(symbol)
+            order_price = None
+            stopPrice=None
+            action = {}
+            if webhook_message["action"] == 'buy': 
+                action.update({'action':'Buy'})
+            elif webhook_message["action"] == 'sell':
+                action.update({'action':'Sell'})
+            
+            data = trade_execution(request)
+            order_data = place_order(data['access_token'],data['account_spec'],data['account_id'],action['action'],symbol,data['order_qty'],data['order_type'],data['is_automated'],order_price=None,stopPrice=None)
+            # print(order_data)
+        return JsonResponse(data, safe=False)
+    else:
+        return JsonResponse({'message':'Trade is Not On, Please on Trade.'})
 
 
 def broker_login(request):
     auth_url = f"{AUTH_URL}?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
     return redirect(auth_url)
+
+
+def trade_signal_update(request):
+    user_id = request.GET.get('user_id')
+    user_instance = User.objects.get(user_id=user_id)
+    
+    if user_instance.user_signal_on == True:
+        user_instance.user_signal_on = False
+        print(user_instance.user_signal_on)
+    elif user_instance.user_signal_on == False:
+        user_instance.user_signal_on = True
+        print(user_instance.user_signal_on)
+
+    user_instance.save()
+    return JsonResponse({'message':'your signal is {}'.format(user_instance.user_signal_on)})    
 
 
 def callback(request):
@@ -302,114 +374,45 @@ def callback(request):
                 update_access_token.expiry_at = expiration_time
                 update_access_token.save()
 
-    if renew_access_token:
-        url = "https://live.tradovateapi.com/v1/auth/renewAccessToken"
-
-        headers = {
-            'Authorization': f"Bearer {renew_access_token}"
-        }
-        current_time = timezone.now()  # Set to the specified date
-        
-        access_token_data = Access_Token.objects.get(user_id = user_instance)
-        expiration_time = access_token_data.expiry_at
-
-        if current_time < expiration_time:
-                response = requests.get(url, headers=headers)
-                response.raise_for_status()
-                renewed_token_data = response.json()
-                renewed_token = renewed_token_data['accessToken']
-                expiration_time = current_time + timedelta(seconds=3600)
-                update_access_token = Access_Token.objects.get(user_id = user_instance)
-                update_access_token.access_token = renewed_token
-                update_access_token.expiry_at = expiration_time
-                update_access_token.save()
-
     return render(request, 'index.html')
 
-# def refresh_access_token(access_token):
+def tradovate_functionalities_data(request):
+    user_id = 1  # This would typically come from the request or authentication
+    # tradovate_functionality = request.GET.get('tradovate_functionality')
+    tradovate_functionality = 'account_info'
 
 
-# def brokerLogin():
+    if user_id:
+        user_instance = User.objects.get(user_id=user_id)
+        token_data = Access_Token.objects.get(user_id=user_instance)
 
-#     form = brokerCredentialForm()
-#     broker_type = request.args.get("broker", "alpaca")
+    if tradovate_functionality == 'account_info':
+        account_info = get_accounts(token_data.access_token)  # HTTP call
+        print(account_info)
+        return JsonResponse(account_info, safe=False)
+    
+    elif tradovate_functionality == 'get_cash_balance':
+        account_info = get_cash_balance(token_data.access_token)  # HTTP call
+        print(account_info)
+        return JsonResponse(account_info, safe=False)
+    
+    elif tradovate_functionality == 'place_order':
+        account_info = place_order(token_data.access_token)  # HTTP call
+        print(account_info)
+        return JsonResponse(account_info, safe=False)
+    
 
-#     # Handle GET request for Tradovate OAuth redirect
-#     if request.method == "GET" and broker_type == "tradovate":
-#         user_id = session.get("user_id")
-#         if not user_id:
-#             raise ValueError("User session not found. Please log in again.")
 
-#         # Remove existing broker credentials for the user
-#         broker_credentials.delete_many({"user_id": user_id})
 
-#         user_id = session.get("user_id")
 
-#         # Save only the user_id and broker type without tokens
-#         broker_credentials.insert_one(
-#             {
-#                 "user_id": user_id,
-#                 "broker": broker_type,
-#             }
-#         )
 
-#         auth_url = f"{AUTH_URL}?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
-#         return redirect(auth_url)
+   
+    
+   
 
-#     elif request.method == "POST":
-#         try:
-#             user_id = session.get("user_id")
-#             if not user_id:
-#                 raise ValueError("User session not found. Please log in again.")
+    
 
-#             # Remove existing broker credentials for the user
-#             broker_credentials.delete_many({"user_id": user_id})
 
-#             if broker_type == "alpaca":
-#                 api_key = request.form.get("api_key")
-#                 api_secret = request.form.get("api_secret")
-
-#                 # Validate Alpaca credentials
-#                 try:
-#                     trade_client = TradingClient(
-#                         api_key, api_secret, paper=True, url_override=None
-#                     )
-#                     trade_client.get_account()  # Throws APIError if credentials are invalid
-#                 except APIError:
-#                     flash(
-#                         "Alpaca login failed, Please Enter Correct Credentials",
-#                         "danger",
-#                     )
-#                     return redirect(url_for("broker.brokerLogin", broker="alpaca"))
-
-#                 encrypted_api_key = encrypt_data(api_key)
-#                 encrypted_api_secret = encrypt_data(api_secret)
-
-#                 access_token_database.insert_one(
-#                     {
-#                         "user_id": user_id,
-#                         "broker": broker_type,
-#                         "api_key": encrypted_api_key,
-#                         "api_secret": encrypted_api_secret,
-#                     }
-#                 )
-#                 flash("Alpaca credentials saved successfully!", "success")
-
-#             elif broker_type == "tradovate":
-
-#                 flash("Tradovate broker type saved successfully!", "success")
-
-#             return redirect(url_for("main_route.index"))
-
-#         except ValueError as ve:
-#             flash(str(ve), "warning")
-#             return redirect(url_for("broker.brokerLogin", broker=broker_type))
-
-#         except Exception as e:
-#             flash("An unexpected error occurred. Please try again.", "danger")
-#             return redirect(url_for("broker.brokerLogin", broker=broker_type))
-
-#     return render_template("broker_login.html", form=form, broker=broker_type)
 
 
 
