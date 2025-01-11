@@ -10,6 +10,7 @@ from django.core.mail import send_mail
 import requests
 from datetime import timedelta,datetime
 from userside.models import *
+from django.utils import timezone
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
@@ -234,7 +235,7 @@ def home(request):
 
 @csrf_exempt
 def trading_view_signal_webhook_listener(request):
-    user_id_from_url = '6762e68e7894a01d32c51a28'
+    user_id_from_url = 1
 
     if request.body:
         webhook_message = json.loads(request.body)
@@ -271,6 +272,7 @@ def callback(request):
         user_instance = User.objects.get(user_id = user_id)
     code = request.GET.get("code")
     renew_access_token = request.GET.get('renew_access_token')
+
     if not code:
         print("not getting code")
     else:
@@ -284,29 +286,43 @@ def callback(request):
         response = requests.post(TOKEN_URL, data=payload)
         response.raise_for_status()
         token_data = response.json()
-        print(token_data)
+   
         
         if "access_token" not in token_data:
             print("not getting token data")
         else:
             access_token = token_data['access_token']
-            current_time = datetime.now()  # Set to the specified date
+            current_time = timezone.now()
             expiration_time = current_time + timedelta(seconds=3600)
-            store_access_token = Access_Token.objects.create(user_id = user_instance, access_token = access_token, expiry_at = expiration_time)
+            if Access_Token.objects.filter(user_id = user_instance).count() < 0:
+                store_access_token = Access_Token.objects.create(user_id = user_instance, access_token = access_token, expiry_at = expiration_time)
+            else:
+                update_access_token = Access_Token.objects.get(user_id = user_instance)
+                update_access_token.access_token = access_token
+                update_access_token.expiry_at = expiration_time
+                update_access_token.save()
 
     if renew_access_token:
         url = "https://live.tradovateapi.com/v1/auth/renewAccessToken"
 
         headers = {
-            'Authorization': f"Bearer {access_token}"
+            'Authorization': f"Bearer {renew_access_token}"
         }
-        current_time = datetime.now()  # Set to the specified date
-        expiration_time = current_time + timedelta(seconds=3600)
+        current_time = timezone.now()  # Set to the specified date
+        
+        access_token_data = Access_Token.objects.get(user_id = user_instance)
+        expiration_time = access_token_data.expiry_at
 
-        if datetime.now() > expiration_time:
+        if current_time < expiration_time:
                 response = requests.get(url, headers=headers)
                 response.raise_for_status()
-                renewed_token = response.json()
+                renewed_token_data = response.json()
+                renewed_token = renewed_token_data['accessToken']
+                expiration_time = current_time + timedelta(seconds=3600)
+                update_access_token = Access_Token.objects.get(user_id = user_instance)
+                update_access_token.access_token = renewed_token
+                update_access_token.expiry_at = expiration_time
+                update_access_token.save()
 
     return render(request, 'index.html')
 
