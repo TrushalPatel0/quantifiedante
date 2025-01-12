@@ -1,4 +1,7 @@
 import aiohttp
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -15,9 +18,7 @@ from django.utils import timezone
 from userside.tradovate_functionalities import *
 from quantifiedante.celery import add
 from userside.tasks import *
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework import status
+
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
@@ -79,13 +80,11 @@ def user_register(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-@csrf_exempt
+@api_view(['POST'])
 def user_login(request):
     if request.method == 'POST':
         email = request.data.get('user_email').lower()
         password = request.data.get('user_password').lower()
-        print(email)
-        print(password)
         val = User.objects.filter(user_email=email ,user_password=password).count()
         print(val)
 
@@ -93,21 +92,21 @@ def user_login(request):
             Data = User.objects.get(user_email=email , user_password=password)
             if Data:
                 request.session['user_id'] = Data.user_id
-                request.session['user_name'] =  Data.user_name
-                request.session['user_email'] =  Data.user_email
+                request.session['user_name'] =  Data.user_id
+                request.session['user_email'] =  Data.user_id
                 request.session['user_logged_in'] = 'yes'
+                return JsonResponse({
+                'message': 'Login successful',
+                'user_id': Data.user_id,
+                'user_name': Data.user_id,
+                'user_email': Data.user_id,
+                }, status=200)
         else:
             return JsonResponse({'error': 'Invalid email or password'}, status=401)
+    else:
+        return JsonResponse({'error': 'Invalid email or password'}, status=401)
 
-            
-
-        # Return user details
-        return JsonResponse({
-            'message': 'Login successful',
-            'user_id': user.id,
-            'user_name': user.username,
-            'user_email': user.email,
-        }, status=200)
+        
 
 @csrf_exempt
 def user_forgot_password(request):
