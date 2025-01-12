@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'userside',
     'django_celery_beat',
     'corsheaders',
-
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
