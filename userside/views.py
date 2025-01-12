@@ -236,8 +236,8 @@ def user_change_password(request):
 # Home view
 def home(request):
     print("Hello, world!")
-    result2 = sub.delay()
-    print(result2)
+    # result2 = sub.delay()
+    # print(result2)
     return render(request, 'index.html')
 
 
@@ -311,7 +311,49 @@ def trading_view_signal_webhook_listener(request):
                 action.update({'action':'Sell'})
             
             data = trade_execution(request)
-            order_data = place_order(data['access_token'],data['account_spec'],data['account_id'],action['action'],symbol,data['order_qty'],data['order_type'],data['is_automated'],order_price=None,stopPrice=None)
+
+            order_type = {}
+
+            if order_type == "market_order":
+                order_type.update({'order_type': 'market_order'})
+
+            elif order_type == "stop_loss_limit_order":
+                order_type.update({'order_type': 'stop_loss_limit_order'})
+
+            elif order_type == "multiple_take_profit":
+                order_type.update({'order_type': 'multiple_take_profit'})
+
+
+            order_data = place_order(data['access_token'],data['account_spec'],data['account_id'],action['action'], symbol, data['order_qty'], order_type['order_type'] ,data['is_automated'],order_price=None,stopPrice=None)
+
+        
+            # take stop_loss limit order
+            action_oco = action['action']
+            data = get_position(data['access_token'])
+            if data[0]['netPos'] > 0:
+                positions = get_position(data['access_token'])
+                liquidated_position = liquidate_position(data['access_token'], positions[0]["accountId"], positions[0]["contractId"], False)
+            
+            if action_oco == 'Buy':
+                response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Buy", symbol, data['order_qty'], "Market", True)
+                response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Sell", data['order_qty'],  float(sl), float(tp1))
+            else:
+                response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Sell", symbol, data['order_qty'], "Market", True)
+                response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Buy", data['order_qty'],  float(sl), float(tp1))
+
+
+
+
+            # if order_type == "multiple_take_profit":
+                # response_entry = place_order(data['access_token'], ,data['account_spec'],data['account_id'], "Buy", symbol, 3, "Market", True)  # order qty = 3
+                # response_tp1 = place_order(accessToken, account_spec, account_id, "Sell", symbol, 1, "Limit", True, order_price=float(tp1))  # order qty = 1
+                # response_tp2 = place_order(accessToken, account_spec, account_id, "Sell", symbol, 1, "Limit", True, order_price=float(tp2))  # order qty = 1
+                # response_tp3 = place_order(accessToken, account_spec, account_id, "Sell", symbol, 1, "Limit", True, order_price=float(tp3))  # order qty = 1
+                # response_sl = place_order(accessToken, account_spec, account_id, "Sell", symbol, 3, "Stop", True, stopPrice=float(sl))  # order qty = 3
+            
+            
+            
+            
             # print(order_data)
         return JsonResponse(data, safe=False)
     else:
@@ -387,21 +429,54 @@ def tradovate_functionalities_data(request):
         token_data = Access_Token.objects.get(user_id=user_instance)
 
     if tradovate_functionality == 'account_info':
-        account_info = get_accounts(token_data.access_token)  # HTTP call
+        account_info = get_accounts(token_data.access_token)  
         print(account_info)
         return JsonResponse(account_info, safe=False)
     
     elif tradovate_functionality == 'get_cash_balance':
-        account_info = get_cash_balance(token_data.access_token)  # HTTP call
+        account_info = get_cash_balance(token_data.access_token) 
         print(account_info)
         return JsonResponse(account_info, safe=False)
+    
+    elif tradovate_functionality == 'get_position':
+        positions = get_position(token_data.access_token) 
+        print(positions)
+        return JsonResponse(positions, safe=False)
+    
+    elif tradovate_functionality == 'get_order_history':
+        order_history = get_order_history(token_data.access_token)  
+        print(order_history)
+        return JsonResponse(order_history, safe=False)
     
     elif tradovate_functionality == 'place_order':
-        account_info = place_order(token_data.access_token)  # HTTP call
+        account_info = place_order(token_data.access_token)  
         print(account_info)
         return JsonResponse(account_info, safe=False)
     
-
+    elif tradovate_functionality == 'place_oso_order':
+        oso_order = place_oso_order(token_data.access_token)  
+        print(oso_order)
+        return JsonResponse(oso_order, safe=False)
+    
+    elif tradovate_functionality == 'place_oco_order':
+        oco_order = place_oco_order(token_data.access_token)  
+        print(oso_order)
+        return JsonResponse(oco_order, safe=False)
+        
+    elif tradovate_functionality == 'cancel_order':
+        cancelled_order = cancel_order(token_data.access_token)  
+        print(cancelled_order)
+        return JsonResponse(cancelled_order, safe=False)
+    
+    elif tradovate_functionality == 'liquidate_position':
+        liquidated_position = liquidate_position(token_data.access_token)  
+        print(liquidated_position)
+        return JsonResponse(liquidated_position, safe=False)
+    
+    elif tradovate_functionality == 'modify_order':
+        modified_order = modify_order(token_data.access_token)  
+        print(modified_order)
+        return JsonResponse(modified_order, safe=False)
 
 
 
