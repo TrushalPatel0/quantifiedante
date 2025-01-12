@@ -79,7 +79,8 @@ def user_register(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-@csrf_exempt
+
+@api_view(['POST'])
 def user_login(request):
     if request.method == 'POST':
         email = request.data.get('user_email').lower()
@@ -91,23 +92,25 @@ def user_login(request):
 
         if val==1:
             Data = User.objects.get(user_email=email , user_password=password)
+            print(Data)
             if Data:
                 request.session['user_id'] = Data.user_id
                 request.session['user_name'] =  Data.user_name
                 request.session['user_email'] =  Data.user_email
                 request.session['user_logged_in'] = 'yes'
+                    # Return user details
+                return JsonResponse({
+                    'message': 'Login successful',
+                    'user_id': Data.user_id,
+                    'user_name': Data.user_name,
+                    'user_email': Data.user_email,
+                }, status=200)
         else:
             return JsonResponse({'error': 'Invalid email or password'}, status=401)
 
             
 
-        # Return user details
-        return JsonResponse({
-            'message': 'Login successful',
-            'user_id': user.id,
-            'user_name': user.username,
-            'user_email': user.email,
-        }, status=200)
+
 
 @csrf_exempt
 def user_forgot_password(request):
@@ -221,13 +224,23 @@ def user_change_password(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# Home view
+@api_view(['GET'])
 def home(request):
     print("Hello, world!")
-    # result2 = sub.delay()
-    # print(result2)
-    return render(request, 'index.html')
-
+    context ={}
+    # Check if the session contains the user_id and user_name
+    if 'user_id' in request.session:
+        uid = request.session['user_id']
+        uname = request.session['user_name']
+        print(uid)
+        print(uname)
+   
+        context = {
+            'user_id': uid,
+            'user_name': uname
+        }
+    
+    return Response(context)
 
 
 
