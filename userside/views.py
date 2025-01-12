@@ -336,7 +336,7 @@ def trading_view_signal_webhook_listener(request):
             
             if action_oco == 'Buy':
                 response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Buy", symbol, data['order_qty'], "Market", True)
-                response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Sell", data['order_qty'],  float(sl), float(tp1))
+                response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Sell", data['order_qty'],  float(trading_signal['slLine']), float(trading_signal['slLine']))
             else:
                 response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Sell", symbol, data['order_qty'], "Market", True)
                 response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Buy", data['order_qty'],  float(sl), float(tp1))
