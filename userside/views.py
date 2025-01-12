@@ -15,6 +15,9 @@ from django.utils import timezone
 from userside.tradovate_functionalities import *
 from quantifiedante.celery import add
 from userside.tasks import *
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
@@ -75,51 +78,36 @@ def user_register(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
 @csrf_exempt
 def user_login(request):
-    """
-    API endpoint to log in a user.
-    Accepts POST requests with JSON body containing required fields: user_email and user_password.
-    """
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
+    if request.method == 'POST':
+        email = request.data.get('user_email').lower()
+        password = request.data.get('user_password').lower()
+        print(email)
+        print(password)
+        val = User.objects.filter(user_email=email ,user_password=password).count()
+        print(val)
 
-    try:
-        data = json.loads(request.body.decode('utf-8'))  # Decode body to string before parsing
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON format or empty request body'}, status=400)
-
-    # Ensure required fields are present
-    required_fields = ['user_email', 'user_password']
-    missing_fields = [field for field in required_fields if field not in data]
-    if missing_fields:
-        return JsonResponse({'error': f'Missing required fields: {", ".join(missing_fields)}'}, status=400)
-
-    # Extract fields
-    user_email = data.get('user_email')
-    user_password = data.get('user_password')
-
-    try:
-        # Check if user exists
-        user = User.objects.filter(user_email=user_email).first()
-        if not user:
+        if val==1:
+            Data = User.objects.get(user_email=email , user_password=password)
+            if Data:
+                request.session['user_id'] = Data.user_id
+                request.session['user_name'] =  Data.user_name
+                request.session['user_email'] =  Data.user_email
+                request.session['user_logged_in'] = 'yes'
+        else:
             return JsonResponse({'error': 'Invalid email or password'}, status=401)
 
-        # Verify password (no hashing, plain text comparison)
-        if user.user_password != user_password:
-            return JsonResponse({'error': 'Invalid email or password'}, status=401)
+            
 
-        # Login successful, return user details
+        # Return user details
         return JsonResponse({
             'message': 'Login successful',
-            'user_id': user.user_id,
-            'user_name': user.user_name,
-            'user_email': user.user_email,
+            'user_id': user.id,
+            'user_name': user.username,
+            'user_email': user.email,
         }, status=200)
-
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-
 
 @csrf_exempt
 def user_forgot_password(request):
