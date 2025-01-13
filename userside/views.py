@@ -1,4 +1,7 @@
 import aiohttp
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -15,6 +18,7 @@ from django.utils import timezone
 from userside.tradovate_functionalities import *
 from quantifiedante.celery import add
 from userside.tasks import *
+
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
@@ -75,50 +79,37 @@ def user_register(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-@csrf_exempt
+
+@api_view(['POST'])
 def user_login(request):
-    """
-    API endpoint to log in a user.
-    Accepts POST requests with JSON body containing required fields: user_email and user_password.
-    """
-    if request.method != 'POST':
-        return JsonResponse({'error': 'Only POST requests are allowed'}, status=405)
+    if request.method == 'POST':
+        email = request.data.get('user_email').lower()
+        password = request.data.get('user_password').lower()
+        val = User.objects.filter(user_email=email ,user_password=password).count()
+        print(val)
 
-    try:
-        data = json.loads(request.body.decode('utf-8'))  # Decode body to string before parsing
-    except json.JSONDecodeError:
-        return JsonResponse({'error': 'Invalid JSON format or empty request body'}, status=400)
-
-    # Ensure required fields are present
-    required_fields = ['user_email', 'user_password']
-    missing_fields = [field for field in required_fields if field not in data]
-    if missing_fields:
-        return JsonResponse({'error': f'Missing required fields: {", ".join(missing_fields)}'}, status=400)
-
-    # Extract fields
-    user_email = data.get('user_email')
-    user_password = data.get('user_password')
-
-    try:
-        # Check if user exists
-        user = User.objects.filter(user_email=user_email).first()
-        if not user:
+        if val==1:
+            Data = User.objects.get(user_email=email , user_password=password)
+            print(Data)
+            if Data:
+                request.session['user_id'] = Data.user_id
+                request.session['user_name'] =  Data.user_id
+                request.session['user_email'] =  Data.user_id
+                request.session['user_logged_in'] = 'yes'
+                    # Return user details
+                return JsonResponse({
+                    'message': 'Login successful',
+                    'user_id': Data.user_id,
+                    'user_name': Data.user_name,
+                    'user_email': Data.user_email,
+                }, status=200)
+        else:
             return JsonResponse({'error': 'Invalid email or password'}, status=401)
+    else:
+        return JsonResponse({'error': 'Invalid email or password'}, status=401)
 
-        # Verify password (no hashing, plain text comparison)
-        if user.user_password != user_password:
-            return JsonResponse({'error': 'Invalid email or password'}, status=401)
+            
 
-        # Login successful, return user details
-        return JsonResponse({
-            'message': 'Login successful',
-            'user_id': user.user_id,
-            'user_name': user.user_name,
-            'user_email': user.user_email,
-        }, status=200)
-
-    except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
 
 
 @csrf_exempt
@@ -233,13 +224,23 @@ def user_change_password(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-# Home view
+@api_view(['GET'])
 def home(request):
     print("Hello, world!")
-    # result2 = sub.delay()
-    # print(result2)
-    return render(request, 'index.html')
-
+    context ={}
+    # Check if the session contains the user_id and user_name
+    if 'user_id' in request.session:
+        uid = request.session['user_id']
+        uname = request.session['user_name']
+        print(uid)
+        print(uname)
+   
+        context = {
+            'user_id': uid,
+            'user_name': uname
+        }
+    
+    return Response(context)
 
 
 
@@ -329,28 +330,49 @@ def trading_view_signal_webhook_listener(request):
         
             # take stop_loss limit order
             action_oco = action['action']
-            data = get_position(data['access_token'])
-            if data[0]['netPos'] > 0:
-                positions = get_position(data['access_token'])
-                liquidated_position = liquidate_position(data['access_token'], positions[0]["accountId"], positions[0]["contractId"], False)
-            
-            if action_oco == 'Buy':
-                response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Buy", symbol, data['order_qty'], "Market", True)
-                response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Sell", data['order_qty'],  float(sl), float(tp1))
-            else:
-                response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Sell", symbol, data['order_qty'], "Market", True)
-                response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Buy", data['order_qty'],  float(sl), float(tp1))
+            Position_Data= get_position(Position_Data['access_token'])
+            response_sl_list = []
+            if order_type == "stop_loss_limit_order":
+                if Position_Data[0]['netPos'] > 0:
+                    liquidated_position = liquidate_position(data['access_token'], Position_Data[0]["accountId"], Position_Data[0]["contractId"], False)
+                
+                if action_oco == 'Buy':
+                    response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Buy", symbol, data['order_qty'], "Market", True)
+                    response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Sell", data['order_qty'],  float(trading_signal['slLine']), float(trading_signal['tp1Line']))
+                else:
+                    response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Sell", symbol, data['order_qty'], "Market", True)
+                    response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Buy", data['order_qty'],  float(trading_signal['slLine']), float(trading_signal['tp1Line']))
 
+            elif order_type == "multiple_take_profit":
+                if action_oco == 'Buy':
+                    response_entry = place_order(data['access_token'], data['account_spec'],data['account_id'], "Buy", symbol, 3, "Market", True)  # order qty = 3
+                    response_tp1 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp1Line']))  # order qty = 1
+                    response_tp2 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp2Line']))  # order qty = 1
+                    response_tp3 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp3Line']))  # order qty = 1
+                    response_sl = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 3, "Stop", True, stopPrice=float(trading_signal['slLine']))  # order qty = 3
+                    response_sl_list.append(response_sl)
+                elif action_oco == 'Sell':
+                    response_entry = place_order(data['access_token'], data['account_spec'],data['account_id'], "Buy", symbol, 3, "Market", True)  # order qty = 3
+                    response_tp1 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp1Line']))  # order qty = 1
+                    response_tp2 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp2Line']))  # order qty = 1
+                    response_tp3 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp3Line']))  # order qty = 1
+                    response_sl = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 3, "Stop", True, stopPrice=float(trading_signal['slLine']))  # order qty = 3
+                    response_sl_list.append(response_sl)
+           
 
+        
+        elif action == "Tp1":
+            modify_sl1 = modify_order(data['access_token'], response_sl_list['orderId'], orderQty=2, orderType="Stop", stopPrice=float(trading_signal['slLine']))
+            # response_id.clear()
+            # response_id.append(response_sl)
 
+        elif action == "Tp2":
+            modify_sl2 = modify_order(data['access_token'], response_sl_list['orderId']['orderId'], orderQty=1, orderType="Stop", stopPrice=float(trading_signal['slLine']))
+            # response_id.clear()
+        
+        # elif action == "Sl Hit":
+        #     liquidation_resp = await liquidate_active_pos(accessToken)
 
-            # if order_type == "multiple_take_profit":
-                # response_entry = place_order(data['access_token'], ,data['account_spec'],data['account_id'], "Buy", symbol, 3, "Market", True)  # order qty = 3
-                # response_tp1 = place_order(accessToken, account_spec, account_id, "Sell", symbol, 1, "Limit", True, order_price=float(tp1))  # order qty = 1
-                # response_tp2 = place_order(accessToken, account_spec, account_id, "Sell", symbol, 1, "Limit", True, order_price=float(tp2))  # order qty = 1
-                # response_tp3 = place_order(accessToken, account_spec, account_id, "Sell", symbol, 1, "Limit", True, order_price=float(tp3))  # order qty = 1
-                # response_sl = place_order(accessToken, account_spec, account_id, "Sell", symbol, 3, "Stop", True, stopPrice=float(sl))  # order qty = 3
-            
             
             
             
