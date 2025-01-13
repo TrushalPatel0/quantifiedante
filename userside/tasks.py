@@ -19,32 +19,30 @@ def sub():
 
 @shared_task
 def renew_access_token():
+    for x in Userdata.objects.filter(user_signal_on=True):
+        token_avail = Access_Token.objects.filter(user_id=x).count()
+        if token_avail > 0:
+            token_data = Access_Token.objects.get(user_id=x)
+            url = "https://live.tradovateapi.com/v1/auth/renewAccessToken"
 
-    user_id = 1
-    if user_id:
-        user_instance = User.objects.get(user_id=user_id)
-        token_data = Access_Token.objects.get(user_id=user_instance)
+            headers = {
+                'Authorization': f"Bearer {token_data.access_token}"
+            }
+            current_time = timezone.now()  # Set to the specified date
+            
+            access_token_data = Access_Token.objects.get(user_id = x)
+            expiration_time = access_token_data.expiry_at
 
-    url = "https://live.tradovateapi.com/v1/auth/renewAccessToken"
-
-    headers = {
-        'Authorization': f"Bearer {token_data.access_token}"
-    }
-    current_time = timezone.now()  # Set to the specified date
-    
-    access_token_data = Access_Token.objects.get(user_id = user_instance)
-    expiration_time = access_token_data.expiry_at
-
-    if current_time < expiration_time:
-        response = requests.get(url, headers=headers)
-        response.raise_for_status()
-        renewed_token_data = response.json()
-        renewed_token = renewed_token_data['accessToken']
-        expiration_time = current_time + timedelta(seconds=3600)
-        update_access_token = Access_Token.objects.get(user_id = user_instance)
-        update_access_token.access_token = renewed_token
-        update_access_token.expiry_at = expiration_time
-        update_access_token.save()
+            if current_time < expiration_time:
+                response = requests.get(url, headers=headers)
+                response.raise_for_status()
+                renewed_token_data = response.json()
+                renewed_token = renewed_token_data['accessToken']
+                expiration_time = current_time + timedelta(seconds=3600)
+                update_access_token = Access_Token.objects.get(user_id = x)
+                update_access_token.access_token = renewed_token
+                update_access_token.expiry_at = expiration_time
+                update_access_token.save()
     return 1
 
 

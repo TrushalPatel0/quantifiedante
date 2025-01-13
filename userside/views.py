@@ -6,7 +6,6 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
-from .models import User
 import json
 import random
 import json
@@ -18,6 +17,8 @@ from django.utils import timezone
 from userside.tradovate_functionalities import *
 from quantifiedante.celery import add
 from userside.tasks import *
+from django.shortcuts import get_object_or_404
+
 
 
 CLIENT_ID =  4788 
@@ -55,14 +56,14 @@ def user_register(request):
     user_dob = data.get('user_dob', None)
     user_gender = data.get('user_gender', None)
     user_address = data.get('user_address', None)
-
+    
     # Check if email already exists
-    if User.objects.filter(user_email=user_email).exists():
+    if Userdata.objects.filter(user_email=user_email).exists():
         return JsonResponse({'error': 'Email already registered'}, status=400)
 
     # Create the user
     try:
-        user = User.objects.create(
+        user = Userdata.objects.create(
             user_name=user_name,
             user_email=user_email,
             user_password=user_password,
@@ -71,6 +72,10 @@ def user_register(request):
             user_gender=user_gender,
             user_address=user_address
         )
+
+        abcd =  'http://localhost:3000/trading_view_signal_webhook_listener?user_id={}'.format(user.user_id)
+        user.user_tradingview_url = abcd
+        user.save()
         return JsonResponse({
             'message': 'User registered successfully',
             'user_id': user.user_id,
@@ -85,24 +90,17 @@ def user_login(request):
     if request.method == 'POST':
         email = request.data.get('user_email').lower()
         password = request.data.get('user_password').lower()
-        val = User.objects.filter(user_email=email ,user_password=password).count()
+        val = Userdata.objects.filter(user_email=email ,user_password=password).count()
         print(val)
 
         if val==1:
-            Data = User.objects.get(user_email=email , user_password=password)
-            print(Data)
-            if Data:
-                request.session['user_id'] = Data.user_id
-                request.session['user_name'] =  Data.user_id
-                request.session['user_email'] =  Data.user_id
-                request.session['user_logged_in'] = 'yes'
-                    # Return user details
-                return JsonResponse({
-                    'message': 'Login successful',
-                    'user_id': Data.user_id,
-                    'user_name': Data.user_name,
-                    'user_email': Data.user_email,
-                }, status=200)
+            Data = Userdata.objects.get(user_email=email , user_password=password)
+            return JsonResponse({
+                'message': 'Login successful',
+                'user_id': Data.user_id,
+                'user_name': Data.user_name,
+                'user_email': Data.user_email,
+            }, status=200)
         else:
             return JsonResponse({'error': 'Invalid email or password'}, status=401)
     else:
@@ -134,7 +132,7 @@ def user_forgot_password(request):
 
     try:
         # Check if user exists
-        user = User.objects.filter(user_email=user_email).first()
+        user = Userdata.objects.filter(user_email=user_email).first()
         if not user:
             return JsonResponse({'error': 'User with this email does not exist'}, status=404)
 
@@ -190,7 +188,7 @@ def user_change_password(request):
 
     try:
         # Check if user exists
-        user = User.objects.filter(user_email=user_email).first()
+        user = Userdata.objects.filter(user_email=user_email).first()
         if not user:
             return JsonResponse({'error': 'User with this email does not exist'}, status=404)
 
@@ -226,35 +224,45 @@ def user_change_password(request):
 
 @api_view(['GET'])
 def home(request):
-    print("Hello, world!")
+    user_id = request.GET.get('user_id')
     context ={}
-    # Check if the session contains the user_id and user_name
-    if 'user_id' in request.session:
-        uid = request.session['user_id']
-        uname = request.session['user_name']
-        print(uid)
-        print(uname)
-   
-        context = {
-            'user_id': uid,
-            'user_name': uname
-        }
-    
+    print(request.GET.get('broker_logout'))
+    if user_id:
+        user_instance = Userdata.objects.get(user_id=user_id)
+        current_time = timezone.now()
+        if request.GET.get('broker_logout') == '1':
+            token_data = Access_Token.objects.get(user_id=user_instance)
+            user_instance.user_signal_on = 0
+            user_instance.save()
+            token_data.delete()
+
+        if Access_Token.objects.filter(user_id=user_instance, expiry_at__gt=current_time).exists():
+            token_data = Access_Token.objects.get(user_id=user_instance)
+            context.update({'token':token_data.access_token})
+        user_data = {'user_id':user_instance.user_id, 'user_name':user_instance.user_name, 'user_email':user_instance.user_email,'user_passphrase':user_instance.user_passphrase,'user_tradingview_url':user_instance.user_tradingview_url,'user_signal_on':user_instance.user_signal_on}
+        context.update({'userdata':user_data})
+        print(context)
     return Response(context)
 
-
-
 def trade_execution(request):
-    user_id = 1
+    user_id = 4
     if user_id:
-        user_instance = User.objects.get(user_id=user_id)
+        user_instance = Userdata.objects.get(user_id=user_id)
         token_data = Access_Token.objects.get(user_id=user_instance)
     
+    userpreference = User_Preference.objects.filter(user_id=user_instance)
+
     account_info = get_accounts(token_data.access_token)  # HTTP call
-   
+    print(account_info)
+    current_account = {'acc_id':None, 'acc_name':None}
+    for x in account_info:
+        if userpreference:
+           if x['id'] == int(userpreference[0].account):
+               current_account.update({'acc_id':x['id'], 'acc_name':x['name']})
+    
     account_spec = account_info[0]['name']
     account_id = account_info[0]['id']
-
+    print(current_account)
     access_token = token_data.access_token
     
     prefrencess_data = User_Preference.objects.get(user_id=user_instance)
@@ -270,23 +278,23 @@ def trade_execution(request):
     # elif order_type == 'market_order':
     #     order_typee = 'Market'
     is_automated = True
-    data = {'account_spec':account_spec,'account_id':account_id,'access_token':access_token,'order_qty':order_qty,'order_type':order_typee,'is_automated':is_automated}
+    data = {'account_spec':current_account['acc_name'],'account_id':current_account['acc_id'],'access_token':access_token,'order_qty':order_qty,'order_type':order_typee,'is_automated':is_automated}
     return data
 
 
 
-@csrf_exempt
+@api_view(['POST','GET'])
 def trading_view_signal_webhook_listener(request):
-    user_id_from_url = 1
+    user_id_from_url = 4
     user_id_from_webhook = request.GET.get('user_id')
-    user_instance = User.objects.get(user_id=user_id_from_webhook)
-    if user_instance == True:
-        print(user_id_from_webhook)
+    print('=================================signal got')
+    user_instance = Userdata.objects.get(user_id=user_id_from_webhook)
+    if user_instance.user_signal_on == True:
         if request.body:
             webhook_message = json.loads(request.body)
 
             print("Webhook message:", webhook_message)
-            user_passphrase_data = User.objects.get(user_passphrase = webhook_message['passphrase'])
+            user_passphrase_data = Userdata.objects.get(user_passphrase = webhook_message['passphrase'])
 
             if not user_passphrase_data:
                 return redirect('/')
@@ -308,88 +316,34 @@ def trading_view_signal_webhook_listener(request):
             action = {}
             if webhook_message["action"] == 'buy': 
                 action.update({'action':'Buy'})
-            elif webhook_message["action"] == 'sell':
+            else:
+
                 action.update({'action':'Sell'})
             
             data = trade_execution(request)
 
             order_type = {}
 
-            if order_type == "market_order":
-                order_type.update({'order_type': 'market_order'})
-
-            elif order_type == "stop_loss_limit_order":
-                order_type.update({'order_type': 'stop_loss_limit_order'})
-
-            elif order_type == "multiple_take_profit":
-                order_type.update({'order_type': 'multiple_take_profit'})
-
+            order_type.update({'order_type': 'Market'})
 
             order_data = place_order(data['access_token'],data['account_spec'],data['account_id'],action['action'], symbol, data['order_qty'], order_type['order_type'] ,data['is_automated'],order_price=None,stopPrice=None)
-
-        
-            # take stop_loss limit order
-            action_oco = action['action']
-            Position_Data= get_position(Position_Data['access_token'])
-            response_sl_list = []
-            if order_type == "stop_loss_limit_order":
-                if Position_Data[0]['netPos'] > 0:
-                    liquidated_position = liquidate_position(data['access_token'], Position_Data[0]["accountId"], Position_Data[0]["contractId"], False)
-                
-                if action_oco == 'Buy':
-                    response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Buy", symbol, data['order_qty'], "Market", True)
-                    response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Sell", data['order_qty'],  float(trading_signal['slLine']), float(trading_signal['tp1Line']))
-                else:
-                    response_market = place_order(data['access_token'], data['account_spec'],data['account_id'], "Sell", symbol, data['order_qty'], "Market", True)
-                    response_oco = place_oco_order(URL, data['account_spec'],data['account_id'], data['access_token'], symbol, "Buy", data['order_qty'],  float(trading_signal['slLine']), float(trading_signal['tp1Line']))
-
-            elif order_type == "multiple_take_profit":
-                if action_oco == 'Buy':
-                    response_entry = place_order(data['access_token'], data['account_spec'],data['account_id'], "Buy", symbol, 3, "Market", True)  # order qty = 3
-                    response_tp1 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp1Line']))  # order qty = 1
-                    response_tp2 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp2Line']))  # order qty = 1
-                    response_tp3 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp3Line']))  # order qty = 1
-                    response_sl = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 3, "Stop", True, stopPrice=float(trading_signal['slLine']))  # order qty = 3
-                    response_sl_list.append(response_sl)
-                elif action_oco == 'Sell':
-                    response_entry = place_order(data['access_token'], data['account_spec'],data['account_id'], "Buy", symbol, 3, "Market", True)  # order qty = 3
-                    response_tp1 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp1Line']))  # order qty = 1
-                    response_tp2 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp2Line']))  # order qty = 1
-                    response_tp3 = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp3Line']))  # order qty = 1
-                    response_sl = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 3, "Stop", True, stopPrice=float(trading_signal['slLine']))  # order qty = 3
-                    response_sl_list.append(response_sl)
-           
-
-        
-        elif action == "Tp1":
-            modify_sl1 = modify_order(data['access_token'], response_sl_list['orderId'], orderQty=2, orderType="Stop", stopPrice=float(trading_signal['slLine']))
-            # response_id.clear()
-            # response_id.append(response_sl)
-
-        elif action == "Tp2":
-            modify_sl2 = modify_order(data['access_token'], response_sl_list['orderId']['orderId'], orderQty=1, orderType="Stop", stopPrice=float(trading_signal['slLine']))
-            # response_id.clear()
-        
-        # elif action == "Sl Hit":
-        #     liquidation_resp = await liquidate_active_pos(accessToken)
-
-            
-            
-            
-            # print(order_data)
-        return JsonResponse(data, safe=False)
+            print(order_data)
+            return JsonResponse(data, safe=False)
+        else:
+            return JsonResponse({'message':'outof body'})
     else:
         return JsonResponse({'message':'Trade is Not On, Please on Trade.'})
 
 
 def broker_login(request):
     auth_url = f"{AUTH_URL}?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
-    return redirect(auth_url)
+    context = {'auth_url':auth_url}
+    return JsonResponse(context)
 
 
 def trade_signal_update(request):
     user_id = request.GET.get('user_id')
-    user_instance = User.objects.get(user_id=user_id)
+    user_instance = Userdata.objects.get(user_id=user_id)
     
     if user_instance.user_signal_on == True:
         user_instance.user_signal_on = False
@@ -403,9 +357,9 @@ def trade_signal_update(request):
 
 
 def callback(request):
-    user_id = 1
+    user_id = 4
     if user_id:
-        user_instance = User.objects.get(user_id = user_id)
+        user_instance = Userdata.objects.get(user_id = user_id)
     code = request.GET.get("code")
     renew_access_token = request.GET.get('renew_access_token')
 
@@ -430,24 +384,29 @@ def callback(request):
             access_token = token_data['access_token']
             current_time = timezone.now()
             expiration_time = current_time + timedelta(seconds=3600)
-            if Access_Token.objects.filter(user_id = user_instance).count() < 0:
+            if Access_Token.objects.filter(user_id = user_instance).count() == 0:
                 store_access_token = Access_Token.objects.create(user_id = user_instance, access_token = access_token, expiry_at = expiration_time)
+                context = {'status':True,'message':'Login Successfull'}
+                return redirect('http://localhost:3000/')
             else:
                 update_access_token = Access_Token.objects.get(user_id = user_instance)
                 update_access_token.access_token = access_token
                 update_access_token.expiry_at = expiration_time
                 update_access_token.save()
+                context = {'status':True,'message':'Login Successfull'}
+                return redirect('http://localhost:3000/')
 
-    return render(request, 'index.html')
 
+
+
+@api_view(['GET'])
 def tradovate_functionalities_data(request):
-    user_id = 1  # This would typically come from the request or authentication
-    # tradovate_functionality = request.GET.get('tradovate_functionality')
-    tradovate_functionality = 'account_info'
-
+    # http://localhost:8000/tradovate_functionalities_data?tradovate_functionality=get_position&user_id=4
+    user_id = request.GET.get('user_id')
+    tradovate_functionality = request.GET.get('tradovate_functionality')
 
     if user_id:
-        user_instance = User.objects.get(user_id=user_id)
+        user_instance = Userdata.objects.get(user_id=user_id)
         token_data = Access_Token.objects.get(user_id=user_instance)
 
     if tradovate_functionality == 'account_info':
@@ -462,8 +421,8 @@ def tradovate_functionalities_data(request):
     
     elif tradovate_functionality == 'get_position':
         positions = get_position(token_data.access_token) 
-        print(positions)
-        return JsonResponse(positions, safe=False)
+        data = {'positions':positions}
+        return JsonResponse(data, safe=False)
     
     elif tradovate_functionality == 'get_order_history':
         order_history = get_order_history(token_data.access_token)  
@@ -501,6 +460,54 @@ def tradovate_functionalities_data(request):
         return JsonResponse(modified_order, safe=False)
 
 
+
+def preferences(request):
+    user_id = request.GET.get('user_id')
+    context = {}
+    accounts = []
+    if user_id:
+        user_instance = Userdata.objects.get(user_id=user_id)
+        user_pref = User_Preference.objects.get(user_id__user_id=user_instance.user_id)
+        user_pref = {'user_preference': user_pref.user_preference,'account_type': user_pref.account_type,'order_size':user_pref.order_size,'time_in_force':user_pref.time_in_force,'order_type':user_pref.order_type,'account':user_pref.account}
+        token_data = get_object_or_404(Access_Token,user_id=user_instance)
+        account_info = get_accounts(token_data.access_token) 
+        context.update({'accounts':account_info,'user_pref':user_pref})    
+    return JsonResponse(context, safe=False)
+
+
+@api_view(['POST','GET'])
+def user_preference_insert_update(request):
+    user_id = request.GET.get('user_id')
+    preference_id = request.data.get('user_preference', None)
+    print(preference_id)
+    user_instance = Userdata.objects.get(user_id=user_id)
+    
+    if preference_id:
+        try:
+            # Update existing preference
+            preference = User_Preference.objects.get(user_preference=preference_id)
+            preference.user_id = user_instance
+            preference.account_type = request.data.get('account_type', preference.account_type)
+            preference.order_size = request.data.get('order_size', preference.order_size)
+            preference.time_in_force = request.data.get('time_in_force', preference.time_in_force)
+            preference.order_type = request.data.get('order_type', preference.order_type)
+            preference.account = request.data.get('account', preference.account)
+            preference.save()
+            return Response({"message": "Preference updated successfully."}, status=status.HTTP_200_OK)
+        except User_Preference.DoesNotExist:
+            return Response({"error": "Preference not found."}, status=status.HTTP_404_NOT_FOUND)
+    else:
+        # Create new preference
+        new_preference = User_Preference(
+            user_id=user_instance,
+            account_type=request.data.get('account_type'),
+            order_size=request.data.get('order_size'),
+            time_in_force=request.data.get('time_in_force'),
+            order_type=request.data.get('order_type'),
+            account=request.data.get('account')
+        )
+        new_preference.save()
+        return JsonResponse({"message": "Preference created successfully."}, status=status.HTTP_201_CREATED)
 
 
    

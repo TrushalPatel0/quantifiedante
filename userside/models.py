@@ -4,7 +4,7 @@ import string
 # Create your models here.
 
 # Create your models here.
-class User(models.Model):
+class Userdata(models.Model):
     user_id = models.BigAutoField(primary_key=True)
     user_name = models.CharField(max_length=155)
     user_email = models.EmailField()
@@ -29,17 +29,16 @@ class User(models.Model):
         return self.user_email
 
     class Meta:
-        db_table = 'User'
+        db_table = 'Userdata'
 
 
 class User_Preference(models.Model):
     user_preference = models.BigAutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(Userdata, on_delete=models.CASCADE)
     account_type = models.CharField(max_length=100, null=True, blank=True)
     order_size = models.IntegerField(null=True, blank=True)
     time_in_force = models.CharField(max_length=100, null=True, blank=True)
     order_type = models.CharField(max_length=100, null=True, blank=True)
-    time_in_force = models.CharField(max_length=100, null=True, blank=True)
     account = models.CharField(max_length=100,null=True,blank=True)
     # marketorder
     # limitorder
@@ -54,8 +53,8 @@ class User_Preference(models.Model):
 
 
 class Access_Token(models.Model):
-    user_preference = models.BigAutoField(primary_key=True)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    Access_Token_id = models.BigAutoField(primary_key=True)
+    user_id = models.ForeignKey(Userdata, on_delete=models.CASCADE)
     access_token = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
     expiry_at = models.DateTimeField(null=True, blank=True)

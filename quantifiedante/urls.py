@@ -19,7 +19,7 @@ from userside import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', views.home, name=''),
+    path('home/', views.home, name='home'),
     path('trading_view_signal_webhook_listener', views.trading_view_signal_webhook_listener, name='trading_view_signal_webhook_listener'),
     path('callback', views.callback, name='callback'),
     path('broker_login', views.broker_login, name='broker_login'),
@@ -30,5 +30,7 @@ urlpatterns = [
     path('tradovate_functionalities_data/', views.tradovate_functionalities_data, name='tradovate_functionalities_data'),
     path('trade_execution/', views.trade_execution, name='trade_execution'),
     path('trade_signal_update/', views.trade_signal_update, name='trade_signal_update'),
+    path('preferences/', views.preferences, name='preferences'),
+    path('user_preference_insert_update/', views.user_preference_insert_update, name='user_preference_insert_update'),
     
 ]

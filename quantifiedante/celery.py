@@ -32,6 +32,6 @@ from celery.schedules import crontab
 app.conf.beat_schedule = {
     'my_periodic_task': {
         'task': 'userside.tasks.renew_access_token',
-        'schedule': crontab(minute='*/1'),  # Run every 5 minutes
+        'schedule': crontab(minute='*/35'),  # Run every 5 minutes
     },
 }
