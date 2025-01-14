@@ -19,7 +19,7 @@ def sub():
 
 @shared_task
 def renew_access_token():
-    for x in Userdata.objects.filter(user_signal_on=True):
+    for x in Userdata.objects.filter():
         token_avail = Access_Token.objects.filter(user_id=x).count()
         if token_avail > 0:
             token_data = Access_Token.objects.get(user_id=x)

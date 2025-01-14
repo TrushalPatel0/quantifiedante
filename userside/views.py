@@ -23,11 +23,12 @@ from django.shortcuts import get_object_or_404
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
-REDIRECT_URI = "http://localhost:8000/callback"
+REDIRECT_URI = "https://test.matipro.in/callback"
 AUTH_URL = "https://trader.tradovate.com/oauth"
 TOKEN_URL = "https://live-api.tradovate.com/auth/oauthtoken"
 URL = "https://demo.tradovateapi.com/v1"
-
+BackEnd = 'http://test.matipro.in'
+FrontEnd = 'http://predictive.quantifiedante.com'
 
 # Create a new user account
 @csrf_exempt
@@ -73,7 +74,7 @@ def user_register(request):
             user_address=user_address
         )
 
-        abcd =  'http://localhost:3000/trading_view_signal_webhook_listener?user_id={}'.format(user.user_id)
+        abcd =  '{}/trading_view_signal_webhook_listener?user_id={}'.format(FrontEnd,user.user_id)
         user.user_tradingview_url = abcd
         user.save()
         return JsonResponse({
@@ -269,14 +270,7 @@ def trade_execution(request):
     order_qty = prefrencess_data.order_size
     order_typee = 'Market'
     order_type = prefrencess_data.account_type
-    # if order_type == 'market_order':
-    #     order_typee = 'Market'
-    # elif order_type == 'limit_order':
-    #     order_typee = 'Limit'
-    # elif order_type == 'stop_loss_limit_order':
-    #     order_typee = 'Market'
-    # elif order_type == 'market_order':
-    #     order_typee = 'Market'
+   
     is_automated = True
     data = {'account_spec':current_account['acc_name'],'account_id':current_account['acc_id'],'access_token':access_token,'order_qty':order_qty,'order_type':order_typee,'is_automated':is_automated}
     return data
@@ -387,14 +381,17 @@ def callback(request):
             if Access_Token.objects.filter(user_id = user_instance).count() == 0:
                 store_access_token = Access_Token.objects.create(user_id = user_instance, access_token = access_token, expiry_at = expiration_time)
                 context = {'status':True,'message':'Login Successfull'}
-                return redirect('http://localhost:3000/')
+                url = '{}'.format(FrontEnd)
+                return redirect(url)
             else:
                 update_access_token = Access_Token.objects.get(user_id = user_instance)
                 update_access_token.access_token = access_token
                 update_access_token.expiry_at = expiration_time
                 update_access_token.save()
                 context = {'status':True,'message':'Login Successfull'}
-                return redirect('http://localhost:3000/')
+                url = '{}'.format(FrontEnd)
+                return redirect(url)
+    return JsonResponse({'message':'your signal is callback'})
 
 
 
