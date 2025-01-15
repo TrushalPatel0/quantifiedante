@@ -23,11 +23,11 @@ from django.shortcuts import get_object_or_404
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
-REDIRECT_URI = "https://test.matipro.in/callback"
+REDIRECT_URI = "https://predictiveapi.quantifiedante.com/callback"
 AUTH_URL = "https://trader.tradovate.com/oauth"
 TOKEN_URL = "https://live-api.tradovate.com/auth/oauthtoken"
 URL = "https://demo.tradovateapi.com/v1"
-BackEnd = 'http://test.matipro.in'
+BackEnd = 'https://predictiveapi.quantifiedante.com'
 FrontEnd = 'http://predictive.quantifiedante.com'
 
 # Create a new user account
@@ -245,8 +245,8 @@ def home(request):
         print(context)
     return Response(context)
 
-def trade_execution(request):
-    user_id = 4
+def trade_execution(request,user_id_from_webhook):
+    user_id = user_id_from_webhook
     if user_id:
         user_instance = Userdata.objects.get(user_id=user_id)
         token_data = Access_Token.objects.get(user_id=user_instance)
@@ -279,7 +279,6 @@ def trade_execution(request):
 
 @api_view(['POST','GET'])
 def trading_view_signal_webhook_listener(request):
-    user_id_from_url = 4
     user_id_from_webhook = request.GET.get('user_id')
     print('=================================signal got')
     user_instance = Userdata.objects.get(user_id=user_id_from_webhook)
@@ -294,7 +293,7 @@ def trading_view_signal_webhook_listener(request):
                 return redirect('/')
 
             trading_signal = {
-                "user_id": user_id_from_url,
+                "user_id": user_id_from_webhook,
                 "timestamp": webhook_message["time"],
                 "ticker": webhook_message["ticker"],
                 "action": webhook_message["action"],
@@ -314,7 +313,7 @@ def trading_view_signal_webhook_listener(request):
 
                 action.update({'action':'Sell'})
             
-            data = trade_execution(request)
+            data = trade_execution(request,user_id_from_webhook)
 
             order_type = {}
 
@@ -332,6 +331,8 @@ def trading_view_signal_webhook_listener(request):
 def broker_login(request):
     auth_url = f"{AUTH_URL}?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
     context = {'auth_url':auth_url}
+    user_id = request.GET.get('user_id')
+    request.session['user_id'] = user_id
     return JsonResponse(context)
 
 
@@ -351,7 +352,7 @@ def trade_signal_update(request):
 
 
 def callback(request):
-    user_id = 4
+    user_id = request.session.get('user_id', None)
     if user_id:
         user_instance = Userdata.objects.get(user_id = user_id)
     code = request.GET.get("code")
