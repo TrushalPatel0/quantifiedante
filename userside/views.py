@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.hashers import make_password
 import json
@@ -18,17 +18,20 @@ from userside.tradovate_functionalities import *
 from quantifiedante.celery import add
 from userside.tasks import *
 from django.shortcuts import get_object_or_404
-
+from userside.bracket_order import get_tradovate_socket
 
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
 REDIRECT_URI = "https://predictiveapi.quantifiedante.com/callback"
+# REDIRECT_URI = "http://localhost:8000/callback"
 AUTH_URL = "https://trader.tradovate.com/oauth"
 TOKEN_URL = "https://live-api.tradovate.com/auth/oauthtoken"
 URL = "https://demo.tradovateapi.com/v1"
 BackEnd = 'https://predictiveapi.quantifiedante.com'
+# BackEnd = 'http://127.0.0.1:8000'
 FrontEnd = 'http://predictive.quantifiedante.com'
+# FrontEnd = 'http://localhost:3000'
 
 # Create a new user account
 @csrf_exempt
@@ -276,9 +279,10 @@ def trade_execution(request,user_id_from_webhook):
     return data
 
 
-
+response_id = []
 @api_view(['POST','GET'])
 def trading_view_signal_webhook_listener(request):
+    user_id_from_url = 4
     user_id_from_webhook = request.GET.get('user_id')
     print('=================================signal got')
     user_instance = Userdata.objects.get(user_id=user_id_from_webhook)
@@ -293,7 +297,7 @@ def trading_view_signal_webhook_listener(request):
                 return redirect('/')
 
             trading_signal = {
-                "user_id": user_id_from_webhook,
+                "user_id": user_id_from_url,
                 "timestamp": webhook_message["time"],
                 "ticker": webhook_message["ticker"],
                 "action": webhook_message["action"],
@@ -306,21 +310,108 @@ def trading_view_signal_webhook_listener(request):
             symbol = convert_ticker(symbol)
             order_price = None
             stopPrice=None
+
             action = {}
             if webhook_message["action"] == 'buy': 
                 action.update({'action':'Buy'})
             else:
-
                 action.update({'action':'Sell'})
             
             data = trade_execution(request,user_id_from_webhook)
 
-            order_type = {}
+            user_prefre = User_Preference.objects.get(user_id__user_id = user_id_from_webhook)
+            order_type = user_prefre.order_type
 
-            order_type.update({'order_type': 'Market'})
+            
+            print('===orderType{} and action:{}'.format(order_type,action['action']))
+            if order_type == 'market_order':
+                order_data = place_order(data['access_token'],data['account_spec'],data['account_id'],action['action'], symbol, data['order_qty'], 'Market' ,data['is_automated'],order_price=None,stopPrice=None)
+                print(order_data)
 
-            order_data = place_order(data['access_token'],data['account_spec'],data['account_id'],action['action'], symbol, data['order_qty'], order_type['order_type'] ,data['is_automated'],order_price=None,stopPrice=None)
-            print(order_data)
+            elif order_type == 'limit_order' and action['action'] == 'Buy':
+                print('Checking....')
+                order_data = place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy",symbol, data['order_qty'], "Limit", True,order_price=None,stopPrice=None)
+                print('===================order DATA==================',order_data)
+                data['order_data'] = order_data
+
+            elif order_type == 'limit_order' and action['action'] == 'Sell':
+                order_data = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol,data['order_qty'], "Limit", True)
+                print(order_data)
+
+
+            elif order_type == 'stop_loss_limit_order' and action['action'] == 'Buy':
+                position = get_position(data['access_token'])
+
+                if position[0]['netPos'] > 0:
+                    liquidate_position(data['access_token'], position[0]['accountId'], position[0]['contractId'],False,None)
+
+                response_market = place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, data['order_qty'], "Market", True)
+                response_oco = place_oco_order(data['access_token'], data['account_spec'], data['account_id'], symbol, "Sell", data['order_qty'],  float(trading_signal['slLine']), float(trading_signal['tp1Line']))
+                print(f"Buy Order Response: {response_market}, {response_oco}")
+
+            elif order_type == 'stop_loss_limit_order' and action['action'] == 'Sell':
+                position = get_position(data['access_token'])
+
+                if position[0]['netPos'] > 0:
+                    liquidate_position(data['access_token'], position[0]['accountId'], position[0]['contractId'],False,None)
+                    
+                response_market = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, data['order_qty'], "Market", True)
+                response_oco = place_oco_order(data['access_token'], data['account_spec'], data['account_id'], symbol, "Buy", data['order_qty'], float(trading_signal['slLine']), float(trading_signal['tp1Line']))
+                print(f"Buy Order Response: {response_market}, {response_oco}")
+
+
+            elif order_type == 'multiple_take_profit' and action['action'] == 'Buy':
+                position = get_position(data['access_token'])
+
+                if position[0]['netPos'] > 0:
+                    liquidate_position(data['access_token'], position[0]['accountId'], position[0]['contractId'],False,None)
+
+                response_entry =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 3, "Market", True)  # order qty = 3
+                response_tp1 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp1Line']))  # order qty = 1
+                response_tp2 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp2Line']))  # order qty = 1
+                response_tp3 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp3Line']))  # order qty = 1
+                response_sl =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 3, "Stop", True, stopPrice=float(trading_signal['slLine']))  # order qty = 3
+                create_mtpo = multiple_take_profit_orders.objects.create(user_id=user_instance,order_id=response_sl['orderId'])
+                response_id.append(response_sl)
+                print(f"Buy Order Response: {response_entry}, {response_tp1}, {response_tp2}, {response_tp3}, {response_sl}, {response_id}")
+
+            elif order_type == 'multiple_take_profit' and action['action'] == 'Sell':
+                position = get_position(data['access_token'])
+
+                if position[0]['netPos'] > 0:
+                    liquidate_position(data['access_token'], position[0]['accountId'], position[0]['contractId'],False,None)
+
+                response_entry =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 3, "Market", True)  # order qty = 3
+                response_tp1 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 1, "Limit", True, order_price=float(trading_signal['tp1Line']))  # order qty = 1
+                response_tp2 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 1, "Limit", True, order_price=float(trading_signal['tp2Line']))  # order qty = 1
+                response_tp3 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 1, "Limit", True, order_price=float(trading_signal['tp3Line']))  # order qty = 1
+                response_sl =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 3, "Stop", True, stopPrice=float(trading_signal['slLine']))  # order qty = 3
+
+                response_id.append(response_sl)
+                print(f"Buy Order Response: {response_entry}, {response_tp1}, {response_tp2}, {response_tp3}, {response_sl}, {response_id}")
+
+            elif order_type == 'multiple_take_profit' and action['action'] == "Tp1":
+                
+                modify_sl1 = modify_order(data['access_token'], response_id[0]['orderId'], 2, "Stop", None, float(trading_signal['slLine']))
+                # response_id.clear()
+                # response_id.append(response_sl)
+
+            elif order_type == 'multiple_take_profit' and action['action'] == "Tp2":
+                modify_sl2 = modify_order(data['access_token'], response_id[0]['orderId'], orderQty=1, orderType="Stop", stopPrice=float(trading_signal['slLine']))
+
+            elif order_type == 'Bracket_Order' and action == "buy":
+
+                socket, account_id, account_spec = get_tradovate_socket(data['access_token'])
+                order = socket.send_order(account_id, account_spec, symbol, "Buy")
+                print(order)
+
+            elif order_type == 'Bracket_Order' and action == "sell":
+
+                socket, account_id, account_spec = get_tradovate_socket(data['access_token'])
+                order = socket.send_order(account_id, account_spec, symbol, "Sell")
+                print(order)
+
+            print('========response',response_id)
             return JsonResponse(data, safe=False)
         else:
             return JsonResponse({'message':'outof body'})
@@ -328,11 +419,11 @@ def trading_view_signal_webhook_listener(request):
         return JsonResponse({'message':'Trade is Not On, Please on Trade.'})
 
 
+
 def broker_login(request):
     auth_url = f"{AUTH_URL}?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
     context = {'auth_url':auth_url}
     user_id = request.GET.get('user_id')
-    request.session['user_id'] = user_id
     return JsonResponse(context)
 
 
@@ -352,12 +443,12 @@ def trade_signal_update(request):
 
 
 def callback(request):
-    user_id = request.session.get('user_id', None)
+    user_id=4
     if user_id:
         user_instance = Userdata.objects.get(user_id = user_id)
     code = request.GET.get("code")
     renew_access_token = request.GET.get('renew_access_token')
-
+    print(code)
     if not code:
         print("not getting code")
     else:

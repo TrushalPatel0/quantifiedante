@@ -75,11 +75,12 @@ def place_order(access_token,account_spec,account_id,action,symbol,order_qty,ord
     print(f"Placing order with payload: {json.dumps(body)}") 
 
     response = requests.post(f"{URL}/order/placeorder", headers=headers, json=body)
+    print("Response Body:", response.text)
     response.raise_for_status() 
     return response.json()
 
-def place_oco_order(url, account_spec, account_id, access_token, symbol, action, order_qty, stop_price, limit_price):
-    
+def place_oco_order(access_token, account_spec, account_id, symbol, action, order_qty, stop_price, limit_price):
+    print('Enter in oco')
     limit = {"action": action, "orderType": "Stop", "stopPrice": stop_price}
     oco = {
         "accountSpec": account_spec,
@@ -92,13 +93,16 @@ def place_oco_order(url, account_spec, account_id, access_token, symbol, action,
         "isAutomated": True,
         "other": limit,
     }
+    print(oco)
     oco_json = json.dumps(oco)
+    print(oco_json)
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json",
     }
     print(f"Placing order with payload: {json.dumps(oco)}") 
     response = requests.post(f"{URL}/order/placeoco", headers=headers, data=oco_json)
+    print("Response Body:", response.text)
     response.raise_for_status() 
     return response.json()
 
@@ -121,6 +125,7 @@ def place_oso_order(access_token,account_spec,account_id,action,symbol,order_qty
         "Content-Type": "application/json",
     }
     response = requests.get(f"{URL}/order/placeOSO", json=body, headers=headers)
+    print("Response Body:", response.text)
     return response.json()
 
 
@@ -179,3 +184,9 @@ def modify_order(access_token, orderId, orderQty=None, orderType=None, price=Non
     }    
     response = requests.get(f"{URL}/order/modifyorder", json=body, headers=headers)
     return response.json()
+
+
+
+
+
+

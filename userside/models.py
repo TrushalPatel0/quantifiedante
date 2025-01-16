@@ -65,3 +65,17 @@ class Access_Token(models.Model):
     class Meta:
         db_table = 'Access_Token'
 
+
+
+
+class multiple_take_profit_orders(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user_id = models.ForeignKey(Userdata, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
+    order_id = models.IntegerField()
+
+    def __str__(self):
+        return self.user_id.user_email
+
+    class Meta:
+        db_table = 'multiple_take_profit_orders'
