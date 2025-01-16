@@ -183,6 +183,8 @@ def modify_order(access_token, orderId, orderQty=None, orderType=None, price=Non
         "Content-Type": "application/json",
     }    
     response = requests.get(f"{URL}/order/modifyorder", json=body, headers=headers)
+    print(f"Response Status Code: {response.status_code}")
+    print(f"Response Text: {response.text}")  
     return response.json()
 
 

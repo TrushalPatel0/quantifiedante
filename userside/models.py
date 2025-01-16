@@ -72,7 +72,7 @@ class multiple_take_profit_orders(models.Model):
     id = models.BigAutoField(primary_key=True)
     user_id = models.ForeignKey(Userdata, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
-    order_id = models.IntegerField()
+    order_id = models.BigIntegerField()
 
     def __str__(self):
         return self.user_id.user_email

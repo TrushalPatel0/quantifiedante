@@ -23,8 +23,8 @@ from userside.bracket_order import get_tradovate_socket
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
-REDIRECT_URI = "https://predictiveapi.quantifiedante.com/callback"
-# REDIRECT_URI = "http://localhost:8000/callback"
+# REDIRECT_URI = "https://predictiveapi.quantifiedante.com/callback"
+REDIRECT_URI = "http://localhost:8000/callback"
 AUTH_URL = "https://trader.tradovate.com/oauth"
 TOKEN_URL = "https://live-api.tradovate.com/auth/oauthtoken"
 URL = "https://demo.tradovateapi.com/v1"
@@ -392,6 +392,7 @@ def trading_view_signal_webhook_listener(request):
 
             elif order_type == 'multiple_take_profit' and action['action'] == "Tp1":
                 
+                print(response_id[0]['orderId'])
                 modify_sl1 = modify_order(data['access_token'], response_id[0]['orderId'], 2, "Stop", None, float(trading_signal['slLine']))
                 # response_id.clear()
                 # response_id.append(response_sl)
