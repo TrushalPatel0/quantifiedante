@@ -23,15 +23,15 @@ from userside.bracket_order import get_tradovate_socket
 
 CLIENT_ID =  4788 
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
-REDIRECT_URI = "https://predictiveapi.quantifiedante.com/callback"
-# REDIRECT_URI = "http://localhost:8000/callback"
+# REDIRECT_URI = "https://predictiveapi.quantifiedante.com/callback"
+REDIRECT_URI = "http://localhost:8000/callback"
 AUTH_URL = "https://trader.tradovate.com/oauth"
 TOKEN_URL = "https://live-api.tradovate.com/auth/oauthtoken"
 URL = "https://demo.tradovateapi.com/v1"
-BackEnd = 'https://predictiveapi.quantifiedante.com'
-# BackEnd = 'http://127.0.0.1:8000'
-FrontEnd = 'http://predictive.quantifiedante.com'
-# FrontEnd = 'http://localhost:3000'
+# BackEnd = 'https://predictiveapi.quantifiedante.com'
+BackEnd = 'http://127.0.0.1:8000'
+# FrontEnd = 'http://predictive.quantifiedante.com'
+FrontEnd = 'http://localhost:3000'
 
 # Create a new user account
 @csrf_exempt
