@@ -392,6 +392,7 @@ def trading_view_signal_webhook_listener(request):
 
             elif order_type == 'multiple_take_profit' and action['action'] == "Tp1":
                 
+                print(response_id[0]['orderId'])
                 modify_sl1 = modify_order(data['access_token'], response_id[0]['orderId'], 2, "Stop", None, float(trading_signal['slLine']))
                 # response_id.clear()
                 # response_id.append(response_sl)
