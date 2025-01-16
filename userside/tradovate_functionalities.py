@@ -166,6 +166,23 @@ def liquidate_position(access_token, account_id, contract_id, admin, custom_tag5
     return response.json()
 
 
+# def liquidate_position(accessToken):
+
+#     account_info = (accessToken)
+#     positions = get_position(accessToken) 
+
+#     if not account_info:
+#         return {"status": "error", "message": "No active positions available"}
+    
+#     liquidate_response = liquidate_position(
+#         accessToken,
+#         account_info[0]["accountId"],
+#         account_info[0]["contractId"],
+#         False,
+#     )
+#     return liquidate_response
+
+
 def modify_order(access_token, orderId, orderQty=None, orderType=None, price=None, stopPrice=None):
     print('==================we are modifing error')
     body = {

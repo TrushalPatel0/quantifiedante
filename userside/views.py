@@ -18,7 +18,7 @@ from userside.tradovate_functionalities import *
 from quantifiedante.celery import add
 from userside.tasks import *
 from django.shortcuts import get_object_or_404
-from userside.weekly_calender import *
+# from userside.weekly_calender import *
 # from userside.bracket_order import connect_tradovate,TradovateSocket
 
 
@@ -238,12 +238,12 @@ def user_change_password(request):
 def home(request):
     user_id = request.GET.get('user_id')
     context ={}
-    calender_dataa = process_calendar_data()
-    print(len(calender_dataa['Datetime']))
-    print(calender_dataa['Datetime'])
-    context.update({'cal':list(calender_dataa['Datetime'])[0]})
-    for x in range(0,len(calender_dataa['Datetime'])):
-        calender_data.objects.create(Datetimee=list(calender_dataa['Datetime'])[x],Event_Start=list(calender_dataa['EventStart'])[x],Event_End=list(calender_dataa['EventEnd'])[x],title=list(calender_dataa['Title'])[x],country=list(calender_dataa['Country'])[x],impact=list(calender_dataa['Impact'])[x])
+    # calender_dataa = process_calendar_data()
+    # print(len(calender_dataa['Datetime']))
+    # print(calender_dataa['Datetime'])
+    # context.update({'cal':list(calender_dataa['Datetime'])[0]})
+    # for x in range(0,len(calender_dataa['Datetime'])):
+    #     calender_data.objects.create(Datetimee=list(calender_dataa['Datetime'])[x],Event_Start=list(calender_dataa['EventStart'])[x],Event_End=list(calender_dataa['EventEnd'])[x],title=list(calender_dataa['Title'])[x],country=list(calender_dataa['Country'])[x],impact=list(calender_dataa['Impact'])[x])
     
     print(request.GET.get('broker_logout'))
     if user_id:
@@ -385,7 +385,7 @@ def trading_view_signal_webhook_listener(request):
             elif order_type == 'multiple_take_profit' and action['action'] == 'Buy':
                 position = get_position(data['access_token'])
 
-                if position[0]['netPos'] > 0:
+                if position[0]['netPos'] != 0:
                     liquidate_position(data['access_token'], position[0]['accountId'], position[0]['contractId'],False,None)
 
                 response_entry =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 3, "Market", True)  # order qty = 3
@@ -400,7 +400,7 @@ def trading_view_signal_webhook_listener(request):
             elif order_type == 'multiple_take_profit' and action['action'] == 'Sell':
                 position = get_position(data['access_token'])
 
-                if position[0]['netPos'] > 0:
+                if position[0]['netPos'] != 0:
                     liquidate_position(data['access_token'], position[0]['accountId'], position[0]['contractId'],False,None)
 
                 response_entry =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 3, "Market", True)  # order qty = 3
