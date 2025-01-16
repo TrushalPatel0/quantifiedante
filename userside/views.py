@@ -18,20 +18,28 @@ from userside.tradovate_functionalities import *
 from quantifiedante.celery import add
 from userside.tasks import *
 from django.shortcuts import get_object_or_404
-from userside.bracket_order import get_tradovate_socket
+from userside.weekly_calender import *
+# from userside.bracket_order import connect_tradovate,TradovateSocket
+
 
 
 CLIENT_ID =  4788 
+CLIENT_ID2 =  4745 
+# localhost_backend_clientid = 47
 CLIENT_SECRET = "6b33308f-47cb-4209-b5e3-e52a1cc12b34" #os.getenv("TRADOVATE_CLIENT_SECRET")
-# REDIRECT_URI = "https://predictiveapi.quantifiedante.com/callback"
-REDIRECT_URI = "http://localhost:8000/callback"
+REDIRECT_URI = "https://predictiveapi.quantifiedante.com/callback"
+# REDIRECT_URI = "http://localhost:8000/callback"
+REDIRECT_URI2 = "http://localhost:3000"
 AUTH_URL = "https://trader.tradovate.com/oauth"
 TOKEN_URL = "https://live-api.tradovate.com/auth/oauthtoken"
 URL = "https://demo.tradovateapi.com/v1"
-# BackEnd = 'https://predictiveapi.quantifiedante.com'
-BackEnd = 'http://127.0.0.1:8000'
-# FrontEnd = 'http://predictive.quantifiedante.com'
-FrontEnd = 'http://localhost:3000'
+BackEnd = 'https://predictiveapi.quantifiedante.com'
+# BackEnd = 'http://127.0.0.1:8000'
+FrontEnd = 'http://predictive.quantifiedante.com'
+# FrontEnd = 'http://localhost:3000'
+    # auth_url = f"{AUTH_URL}?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
+
+
 
 # Create a new user account
 @csrf_exempt
@@ -230,6 +238,13 @@ def user_change_password(request):
 def home(request):
     user_id = request.GET.get('user_id')
     context ={}
+    calender_dataa = process_calendar_data()
+    print(len(calender_dataa['Datetime']))
+    print(calender_dataa['Datetime'])
+    context.update({'cal':list(calender_dataa['Datetime'])[0]})
+    for x in range(0,len(calender_dataa['Datetime'])):
+        calender_data.objects.create(Datetimee=list(calender_dataa['Datetime'])[x],Event_Start=list(calender_dataa['EventStart'])[x],Event_End=list(calender_dataa['EventEnd'])[x],title=list(calender_dataa['Title'])[x],country=list(calender_dataa['Country'])[x],impact=list(calender_dataa['Impact'])[x])
+    
     print(request.GET.get('broker_logout'))
     if user_id:
         user_instance = Userdata.objects.get(user_id=user_id)
@@ -284,7 +299,9 @@ response_id = []
 def trading_view_signal_webhook_listener(request):
     user_id_from_url = 4
     user_id_from_webhook = request.GET.get('user_id')
-    print('=================================signal got')
+    # current_time = timezone.now()
+    # for x in calender_data.objects.all():
+    #     print(x.Datetimee)    
     user_instance = Userdata.objects.get(user_id=user_id_from_webhook)
     if user_instance.user_signal_on == True:
         if request.body:
@@ -305,6 +322,7 @@ def trading_view_signal_webhook_listener(request):
                 "tp2Line": webhook_message["tp2Line"],
                 "tp3Line": webhook_message["tp3Line"],
                 "slLine": webhook_message["slLine"],
+                "entry_price": webhook_message["entry price"],
             }
             symbol = webhook_message["ticker"]
             symbol = convert_ticker(symbol)
@@ -314,8 +332,12 @@ def trading_view_signal_webhook_listener(request):
             action = {}
             if webhook_message["action"] == 'buy': 
                 action.update({'action':'Buy'})
-            else:
+            elif webhook_message["action"] == 'sell':
                 action.update({'action':'Sell'})
+            elif webhook_message["action"] == 'Tp1':
+                action.update({'action':'Tp1'})
+            else:
+                action.update({'action':'Tp2'})
             
             data = trade_execution(request,user_id_from_webhook)
 
@@ -330,12 +352,12 @@ def trading_view_signal_webhook_listener(request):
 
             elif order_type == 'limit_order' and action['action'] == 'Buy':
                 print('Checking....')
-                order_data = place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy",symbol, data['order_qty'], "Limit", True,order_price=None,stopPrice=None)
+                order_data = place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy",symbol, data['order_qty'], "Limit", True,order_price=float(trading_signal['entry_price']),stopPrice=None)
                 print('===================order DATA==================',order_data)
                 data['order_data'] = order_data
 
             elif order_type == 'limit_order' and action['action'] == 'Sell':
-                order_data = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol,data['order_qty'], "Limit", True)
+                order_data = place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol,data['order_qty'], "Limit", True,order_price=float(trading_signal['entry_price']),stopPrice=None)
                 print(order_data)
 
 
@@ -386,33 +408,60 @@ def trading_view_signal_webhook_listener(request):
                 response_tp2 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 1, "Limit", True, order_price=float(trading_signal['tp2Line']))  # order qty = 1
                 response_tp3 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 1, "Limit", True, order_price=float(trading_signal['tp3Line']))  # order qty = 1
                 response_sl =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 3, "Stop", True, stopPrice=float(trading_signal['slLine']))  # order qty = 3
-
+                create_mtpo = multiple_take_profit_orders.objects.create(user_id=user_instance,order_id=response_sl['orderId'])
                 response_id.append(response_sl)
                 print(f"Buy Order Response: {response_entry}, {response_tp1}, {response_tp2}, {response_tp3}, {response_sl}, {response_id}")
 
             elif order_type == 'multiple_take_profit' and action['action'] == "Tp1":
-                
-                print(response_id[0]['orderId'])
-                modify_sl1 = modify_order(data['access_token'], response_id[0]['orderId'], 2, "Stop", None, float(trading_signal['slLine']))
-                # response_id.clear()
-                # response_id.append(response_sl)
+                print('order_type ={} , action={}'.format(order_type,action['action']))
+                order_id = multiple_take_profit_orders.objects.filter(user_id = user_instance).last()
+                print(order_id.order_id)
+                if order_id:
+                    modify_sl1 = modify_order(data['access_token'], int(order_id.order_id), orderQty = 2, orderType = "Stop", stopPrice = float(trading_signal['slLine']))
 
             elif order_type == 'multiple_take_profit' and action['action'] == "Tp2":
-                modify_sl2 = modify_order(data['access_token'], response_id[0]['orderId'], orderQty=1, orderType="Stop", stopPrice=float(trading_signal['slLine']))
+                order_id = multiple_take_profit_orders.objects.filter(user_id = user_instance).last()
+                modify_sl2 = modify_order(data['access_token'], int(order_id.order_id), orderQty=1, orderType="Stop", stopPrice=float(trading_signal['slLine']))
+                
+            # elif order_type == 'Bracket_Order' and action['action'] == "Buy":
+            #     # Order Parameters
+            #     params = {
+            #         "entryVersion": {
+            #             "orderQty": 1,
+            #             "orderType": "Market"
+            #         },
+            #         "brackets": [{
+            #             "qty": 1,
+            #             "profitTarget": -30,
+            #             "stopLoss": 15,
+            #             "trailingStop": False
+            #       }]
+            #     }
+            #     socket, account_id, account_spec = connect_tradovate(request, data['access_token'])
+            #     order = socket.send_order(account_id, account_spec, symbol, "Buy",params)
+            #     print(order)
 
-            elif order_type == 'Bracket_Order' and action == "buy":
+            # elif order_type == 'Bracket_Order' and action['action'] == "Sell":
+            #     print('enterrr')
+            #     params = {
+            #         "entryVersion": {
+            #             "orderQty": 1,
+            #             "orderType": "Market"
+            #         },
+            #         "brackets": [{
+            #             "qty": 1,
+            #             "profitTarget": -30,
+            #             "stopLoss": 15,
+            #             "trailingStop": False
+            #       }]
+            #     }
 
-                socket, account_id, account_spec = get_tradovate_socket(data['access_token'])
-                order = socket.send_order(account_id, account_spec, symbol, "Buy")
-                print(order)
+            #     socket = TradovateSocket()
+            #     socket, account_id, account_spec = connect_tradovate(request, data['access_token'])
+            #     order = socket.send_order(account_id, account_spec, symbol, "Sell", params)
+            #     print(order)
 
-            elif order_type == 'Bracket_Order' and action == "sell":
 
-                socket, account_id, account_spec = get_tradovate_socket(data['access_token'])
-                order = socket.send_order(account_id, account_spec, symbol, "Sell")
-                print(order)
-
-            print('========response',response_id)
             return JsonResponse(data, safe=False)
         else:
             return JsonResponse({'message':'outof body'})

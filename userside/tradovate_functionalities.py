@@ -162,12 +162,12 @@ def liquidate_position(access_token, account_id, contract_id, admin, custom_tag5
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json",
     }
-    response = requests.get(f"{URL}/order/liquidateposition", json=body, headers=headers)
+    response = requests.post(f"{URL}/order/liquidateposition", json=body, headers=headers)
     return response.json()
 
 
 def modify_order(access_token, orderId, orderQty=None, orderType=None, price=None, stopPrice=None):
-
+    print('==================we are modifing error')
     body = {
             "orderId": orderId,
             "orderQty": orderQty,
@@ -176,13 +176,14 @@ def modify_order(access_token, orderId, orderQty=None, orderType=None, price=Non
             "stopPrice": stopPrice,
             "isAutomated": True
           }
+    print("============body=======",body)
 
     headers = {
         "Accept": "application/json",
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json",
     }    
-    response = requests.get(f"{URL}/order/modifyorder", json=body, headers=headers)
+    response = requests.post(f"{URL}/order/modifyorder", json=body, headers=headers)
     print(f"Response Status Code: {response.status_code}")
     print(f"Response Text: {response.text}")  
     return response.json()

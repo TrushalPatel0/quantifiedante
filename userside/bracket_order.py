@@ -1,107 +1,150 @@
-import json
-import requests
-import websockets
-import logging
-import threading
-import time
-from userside.tradovate_functionalities import get_accounts
+# import json
+# import asyncio
+# import websockets
+# import aiohttp
+# import requests
+# from django.http import JsonResponse
+# from django.views.decorators.csrf import csrf_exempt
+# from django.utils.decorators import method_decorator
+# from django.views import View
+# import nest_asyncio
 
-URL = 'wss://demo.tradovateapi.com/v1/websocket'
-REST_URL = 'https://demo.tradovateapi.com/v1'
+# # Apply nest_asyncio to allow multiple event loop calls
+# nest_asyncio.apply()
 
-class TradovateSocket:
-    def _init_(self, debug_label="tvSocket"):
-        self.counter = 0
-        self.ws = None
-        self.debug_label = debug_label
-        self.is_connected = False
-        self.connection_thread = None
+# # Credentials
+# CREDENTIALS = {
+#     "name": "Your credentials here",
+#     "password": "Your credentials here",
+#     "appId": "Sample App",
+#     "appVersion": "1.0",
+#     "cid": 0,
+#     "sec": "Your API secret here"
+# }
+
+# # Constants for URLs
+# URL = 'wss://demo.tradovateapi.com/v1/websocket'
+# REST_URL = 'https://demo.tradovateapi.com/v1'
+
+# # Order Parameters
+# PARAMS = {
+#     "entryVersion": {
+#         "orderQty": 1,
+#         "orderType": "Market"
+#     },
+#     "brackets": [{
+#         "qty": 1,
+#         "profitTarget": -30,
+#         "stopLoss": 15,
+#         "trailingStop": False
+#     }]
+# }
+
+# class TradovateSocket:
+#     def __init__(self, debug_label="tvSocket"):
+#         self.counter = 0
+#         self.ws = None
+#         self.debug_label = debug_label
+
+#     def increment(self):
+#         self.counter += 1
+#         return self.counter
+
+#     async def connect(self, url, access_token):
+#         """Connect to the WebSocket server."""
+#         while True:
+#             try:
+#                 print(f"Connecting to {url}...")
+#                 self.ws = await websockets.connect(url)
+#                 print("WebSocket connected.")
+#                 await self.authorize(access_token)
+#                 asyncio.create_task(self.listen_to_server())  # Start listening
+#                 break
+#             except websockets.exceptions.ConnectionClosed as e:
+#                 print(f"Connection closed: {e}. Reconnecting...")
+#                 await asyncio.sleep(2)
+#             except Exception as e:
+#                 print(f"Connection error: {e}. Retrying...")
+#                 await asyncio.sleep(2)
+
+#     async def authorize(self, access_token):
+#         """Authorize the WebSocket using the access token."""
+#         message = f"authorize\n0\n\n{access_token}"
+#         await self.send_raw(message)
+#         print("Authorization sent.")
+
+#     async def send_order(self, account_id, account_spec, symbol, action):
+#         """Send an order to the WebSocket."""
+#         body = {
+#             "accountId": account_id,
+#             "accountSpec": account_spec,
+#             "symbol": symbol,
+#             "action": action,
+#             "orderStrategyTypeId": 2,
+#             "params": json.dumps(PARAMS)
+#         }
+#         message_id = self.increment()
+#         message = f"orderstrategy/startorderstrategy\n{message_id}\n\n{json.dumps(body)}"
+#         print(f"Sending order: {message}")
+#         await self.send_raw(message)
+
+#     async def send_raw(self, message):
+#         """Send a raw message to the WebSocket."""
+#         try:
+#             await self.ws.send(message)
+#         except Exception as e:
+#             print(f"Failed to send message: {e}")
+
+#     async def listen_to_server(self):
+#         """Listen for messages from the server."""
+#         try:
+#             while True:
+#                 message = await self.ws.recv()
+#                 print(f"Received: {message}")
+#         except websockets.exceptions.ConnectionClosed as e:
+#             print(f"WebSocket connection closed: {e}")
+
+#     async def close(self):
+#         """Close the WebSocket connection."""
+#         if self.ws:
+#             await self.ws.close()
+#             print("WebSocket closed.")
 
 
-    def increment(self):
-        self.counter += 1
-        return self.counter
+# def get_account_id(access_token):
+#     """Fetch the first account ID using the REST API."""
+#     response = requests.get(
+#         f"{REST_URL}/account/list",
+#         headers={"Authorization": f"Bearer {access_token}", "Accept": "application/json"}
+#     )
+#     response.raise_for_status()
+#     accounts = response.json()
+#     if accounts:
+#         return accounts[0]["id"], accounts[0]["name"]
+#     return None, None
 
-    def connect(self, url, access_token):
-        """Connect to the WebSocket server."""
-        self.access_token = access_token
-        self.url = url
-        self.connection_thread = threading.Thread(target=self._connect_thread)
-        self.connection_thread.daemon = True  # Allow the thread to be killed when the main program ends
-        self.connection_thread.start()
-    
-    def _connect_thread(self):
-        while True:
-            try:
-                self.ws = websockets.connect(self.url)
-                self.ws = self.ws._enter_()
-                self.authorize(self.access_token)
-                self.is_connected = True
-                self.listen_to_server()
-                break
-            except websockets.exceptions.ConnectionClosed as e:
-                time.sleep(2)
-            except Exception as e:
-                time.sleep(2)
-    
-    def authorize(self, access_token):
-         """Authorize the WebSocket using the access token."""
-         message = f"authorize\n0\n\n{access_token}"
-         self.send_raw(message)
+# @method_decorator(csrf_exempt, name='dispatch')
+# class TradovateView(View):
 
-    def send_order(self, account_id, account_spec, symbol, action, params):
-         """Send an order to the WebSocket."""
-         body = {
-             "accountId": account_id,
-             "accountSpec": account_spec,
-             "symbol": symbol,
-             "action": action,
-             "orderStrategyTypeId": 2,
-             "params": json.dumps(params)
-         }
-         message_id = self.increment()
-         message = f"orderstrategy/startorderstrategy\n{message_id}\n\n{json.dumps(body)}"
-         self.send_raw(message)
+#     async def post(self, request):
+#         data = json.loads(request.body)
+#         action = data.get("action", "Buy")
+#         symbol = data.get("symbol", "MNQH5")
 
-    def send_raw(self, message):
-         """Send a raw message to the WebSocket."""
-         try:
-             self.ws.send(message)
-         except Exception as e:
-             print(f"Failed to send message: {e}")
-    
-    def listen_to_server(self):
-        """Listen for messages from the server."""
-        try:
-            while True:
-                message = self.ws.recv()
-        except websockets.exceptions.ConnectionClosed as e:
-            self.is_connected = False
-        except Exception as e:
-            self.is_connected = False
+#         # Get access token
+#         token_data = await get_access_token(CREDENTIALS)
+#         access_token = token_data["accessToken"]
 
-    def close(self):
-        """Close the WebSocket connection."""
-        if self.ws:
-            self.ws.close()
-            self.is_connected = False
-        if self.connection_thread:
-            self.connection_thread.join()
+#         # Get account details
+#         account_id, account_spec = get_account_id(access_token)
+#         if not account_id:
+#             return JsonResponse({"error": "No account found."}, status=400)
 
+#         # Connect to WebSocket
+#         socket = TradovateSocket()
+#         await socket.connect(URL, access_token)
 
+#         # Send an order
+#         await socket.send_order(account_id, account_spec, symbol, action)
 
-def get_tradovate_socket(access_token):
-    
-     # Get account details
-    account_info = get_accounts(access_token)
-    account_spec = account_info[0]['name']
-    account_id = account_info[0]['id']
-    if not account_id:
-         return None
-
-    # Connect to WebSocket
-    socket = TradovateSocket()
-    socket.connect(URL, access_token)
-
-    # Return the socket and account details
-    return socket, account_id, account_spec
+#         return JsonResponse({"message": "Order placed successfully."})

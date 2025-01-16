@@ -79,3 +79,22 @@ class multiple_take_profit_orders(models.Model):
 
     class Meta:
         db_table = 'multiple_take_profit_orders'
+
+
+
+
+class calender_data(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    created_at = models.DateTimeField(auto_now_add=True,null=True, blank=True)
+    Datetimee = models.DateTimeField(null=True,blank=True)
+    Event_Start = models.DateTimeField(null=True,blank=True)
+    Event_End = models.DateTimeField(null=True,blank=True)
+    title = models.CharField(max_length=100, null=True, blank=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
+    impact = models.CharField(max_length=100, null=True, blank=True)
+
+    def __str__(self):
+        return '{} - {}'.format(self.title, self.Datetimee)
+
+    class Meta:
+        db_table = 'calender_data'
