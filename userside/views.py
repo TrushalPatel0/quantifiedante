@@ -20,6 +20,7 @@ from userside.tasks import *
 from django.shortcuts import get_object_or_404
 # from userside.weekly_calender import *
 # from userside.bracket_order import connect_tradovate,TradovateSocket
+import time
 
 
 
@@ -388,6 +389,8 @@ def trading_view_signal_webhook_listener(request):
                 if position[0]['netPos'] != 0:
                     liquidate_position(data['access_token'], position[0]['accountId'], position[0]['contractId'],False,None)
 
+                time.sleep(0.40)
+
                 response_entry =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 3, "Market", True)  # order qty = 3
                 response_tp1 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp1Line']))  # order qty = 1
                 response_tp2 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 1, "Limit", True, order_price=float(trading_signal['tp2Line']))  # order qty = 1
@@ -402,6 +405,8 @@ def trading_view_signal_webhook_listener(request):
 
                 if position[0]['netPos'] != 0:
                     liquidate_position(data['access_token'], position[0]['accountId'], position[0]['contractId'],False,None)
+
+                time.sleep(0.40)
 
                 response_entry =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Sell", symbol, 3, "Market", True)  # order qty = 3
                 response_tp1 =  place_order(data['access_token'], data['account_spec'], data['account_id'], "Buy", symbol, 1, "Limit", True, order_price=float(trading_signal['tp1Line']))  # order qty = 1
@@ -421,7 +426,9 @@ def trading_view_signal_webhook_listener(request):
 
             elif order_type == 'multiple_take_profit' and action['action'] == "Tp2":
                 order_id = multiple_take_profit_orders.objects.filter(user_id = user_instance).last()
-                modify_sl2 = modify_order(data['access_token'], int(order_id.order_id), orderQty=1, orderType="Stop", stopPrice=float(trading_signal['slLine']))
+                print(order_id.order_id)
+                if order_id:
+                    modify_sl2 = modify_order(data['access_token'], int(order_id.order_id), orderQty=1, orderType="Stop", stopPrice=float(trading_signal['slLine']))
                 
             # elif order_type == 'Bracket_Order' and action['action'] == "Buy":
             #     # Order Parameters
