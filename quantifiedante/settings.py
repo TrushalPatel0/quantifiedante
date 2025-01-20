@@ -82,10 +82,10 @@ WSGI_APPLICATION = 'quantifiedante.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'quantifiedante',
-        'USER': 'miniStudy',
+        'NAME': 'predictivequantifiedante',
+        'USER': 'predictivequantifiedante',
         'PASSWORD': '71554913@TmP@',
-        'HOST': '93.127.167.143',
+        'HOST': '44.222.204.134',
         'PORT': '3306',
         'CONN_MAX_AGE': 6000,
     }
@@ -181,3 +181,21 @@ CORS_ALLOW_HEADERS = [
     "user-agent",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+
+
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#         },
+#     },
+#     'loggers': {
+#         'django.db.backends': {
+#             'handlers': ['console'],
+#             'level': 'DEBUG',
+#         },
+#     },
+# }
