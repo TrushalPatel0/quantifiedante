@@ -34,6 +34,7 @@ urlpatterns = [
     path('trade_signal_update/', views.trade_signal_update, name='trade_signal_update'),
     path('preferences/', views.preferences, name='preferences'),
     path('user_preference_insert_update/', views.user_preference_insert_update, name='user_preference_insert_update'),
+    path('show_current_calender/', views.show_current_calender, name='show_current_calender'),
     
 ]
 

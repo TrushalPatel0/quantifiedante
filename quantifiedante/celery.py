@@ -34,4 +34,12 @@ app.conf.beat_schedule = {
         'task': 'userside.tasks.renew_access_token',
         'schedule': crontab(minute='*/35'),  # Run every 5 minutes
     },
+    'calendar_data_update': {
+        'task': 'userside.tasks.get_store_calender_data',
+        'schedule': crontab(minute='*/1440'),  # Run every day at 5 AM
+    },
+    'on_event_liquidate': {
+        'task': 'userside.tasks.on_event_end_trade',
+        'schedule': crontab(minute='*/1'),
+    },
 }

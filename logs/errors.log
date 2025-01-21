@@ -1,0 +1,1066 @@
+ERROR 2025-01-21 13:24:42,897 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 963, in json
+    return complexjson.loads(self.content.decode(encoding), **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 262, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 16, in process_calendar_data
+    data = download_file_respecting_rate_limit()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 11, in download_file_respecting_rate_limit
+    print(response.json())
+          ~~~~~~~~~~~~~^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 971, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+ERROR 2025-01-21 13:24:42,902 basehttp "GET /home/ HTTP/1.1" 500 150939
+ERROR 2025-01-21 13:25:35,868 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 262, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 251, in get_store_calender_data
+    print(len(calender_dataa['Datetime']))
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^
+TypeError: string indices must be integers, not 'str'
+ERROR 2025-01-21 13:25:35,871 basehttp "GET /home/ HTTP/1.1" 500 108542
+ERROR 2025-01-21 13:26:25,615 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 262, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 251, in get_store_calender_data
+    print(len(calender_dataa['Datetime']))
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^
+TypeError: string indices must be integers, not 'str'
+ERROR 2025-01-21 13:26:25,618 basehttp "GET /home/ HTTP/1.1" 500 113421
+ERROR 2025-01-21 13:26:54,388 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 262, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 251, in get_store_calender_data
+    print(len(calender_dataa['Datetime']))
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^
+TypeError: 'method' object is not subscriptable
+ERROR 2025-01-21 13:26:54,391 basehttp "GET /home/ HTTP/1.1" 500 108549
+ERROR 2025-01-21 13:27:51,980 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 262, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 251, in get_store_calender_data
+    print(len(calender_dataa['Datetime']))
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^
+TypeError: 'method' object is not subscriptable
+ERROR 2025-01-21 13:27:51,985 basehttp "GET /home/ HTTP/1.1" 500 108549
+ERROR 2025-01-21 13:28:11,382 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 974, in json
+    return complexjson.loads(self.text, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 262, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 16, in process_calendar_data
+    data = download_file_respecting_rate_limit()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 11, in download_file_respecting_rate_limit
+    data = response.json()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 978, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+ERROR 2025-01-21 13:28:11,386 basehttp "GET /home/ HTTP/1.1" 500 154376
+ERROR 2025-01-21 13:29:08,861 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 974, in json
+    return complexjson.loads(self.text, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 262, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 16, in process_calendar_data
+    data = download_file_respecting_rate_limit()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 11, in download_file_respecting_rate_limit
+    data = response.json()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 978, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+ERROR 2025-01-21 13:29:08,870 basehttp "GET /home/ HTTP/1.1" 500 154379
+ERROR 2025-01-21 13:29:20,481 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 262, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 251, in get_store_calender_data
+    print(len(calender_dataa['Datetime']))
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^
+TypeError: 'method' object is not subscriptable
+ERROR 2025-01-21 13:29:20,484 basehttp "GET /home/ HTTP/1.1" 500 108677
+ERROR 2025-01-21 13:36:43,627 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 262, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 251, in get_store_calender_data
+    print(len(calender_dataa['Datetime']))
+              ~~~~~~~~~~~~~~^^^^^^^^^^^^
+TypeError: list indices must be integers or slices, not str
+ERROR 2025-01-21 13:36:43,630 basehttp "GET /home/ HTTP/1.1" 500 115790
+ERROR 2025-01-21 13:39:25,043 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 19, in process_calendar_data
+    data = pd.read_json(data)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\json\_json.py", line 791, in read_json
+    json_reader = JsonReader(
+        path_or_buf,
+    ...<16 lines>...
+        engine=engine,
+    )
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\json\_json.py", line 904, in __init__
+    data = self._get_data_from_filepath(filepath_or_buffer)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\json\_json.py", line 944, in _get_data_from_filepath
+    self.handles = get_handle(
+                   ~~~~~~~~~~^
+        filepath_or_buffer,
+        ^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        errors=self.encoding_errors,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\common.py", line 728, in get_handle
+    ioargs = _get_filepath_or_buffer(
+        path_or_buf,
+    ...<3 lines>...
+        storage_options=storage_options,
+    )
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\common.py", line 472, in _get_filepath_or_buffer
+    raise ValueError(msg)
+ValueError: Invalid file path or buffer object type: <class 'list'>
+ERROR 2025-01-21 13:39:25,049 basehttp "GET /home/ HTTP/1.1" 500 183112
+ERROR 2025-01-21 13:40:21,789 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 19, in process_calendar_data
+    data = pd.read_json(data[0])
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\json\_json.py", line 791, in read_json
+    json_reader = JsonReader(
+        path_or_buf,
+    ...<16 lines>...
+        engine=engine,
+    )
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\json\_json.py", line 904, in __init__
+    data = self._get_data_from_filepath(filepath_or_buffer)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\json\_json.py", line 944, in _get_data_from_filepath
+    self.handles = get_handle(
+                   ~~~~~~~~~~^
+        filepath_or_buffer,
+        ^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+        errors=self.encoding_errors,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\common.py", line 728, in get_handle
+    ioargs = _get_filepath_or_buffer(
+        path_or_buf,
+    ...<3 lines>...
+        storage_options=storage_options,
+    )
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\io\common.py", line 472, in _get_filepath_or_buffer
+    raise ValueError(msg)
+ValueError: Invalid file path or buffer object type: <class 'dict'>
+ERROR 2025-01-21 13:40:21,793 basehttp "GET /home/ HTTP/1.1" 500 148059
+ERROR 2025-01-21 13:43:26,423 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'Country'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 21, in process_calendar_data
+    data = data[data['Country'] == 'USD'].drop(columns=['Forecast', 'Previous', 'URL'])
+                ~~~~^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'Country'
+ERROR 2025-01-21 13:43:26,429 basehttp "GET /home/ HTTP/1.1" 500 130668
+ERROR 2025-01-21 13:44:31,818 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 974, in json
+    return complexjson.loads(self.text, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 16, in process_calendar_data
+    data = download_file_respecting_rate_limit()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 11, in download_file_respecting_rate_limit
+    data = response.json()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 978, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+ERROR 2025-01-21 13:44:31,822 basehttp "GET /home/ HTTP/1.1" 500 154329
+ERROR 2025-01-21 13:45:34,520 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 29, in process_calendar_data
+    df_usd['Datetime'] = df_usd['Datetime'].dt.tz_localize(new_york_tz)
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\accessor.py", line 112, in f
+    return self._delegate_method(name, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\accessors.py", line 132, in _delegate_method
+    result = method(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\datetimes.py", line 293, in tz_localize
+    arr = self._data.tz_localize(tz, ambiguous, nonexistent)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\arrays\_mixins.py", line 81, in method
+    return meth(self, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\arrays\datetimes.py", line 1083, in tz_localize
+    raise TypeError("Already tz-aware, use tz_convert to convert.")
+TypeError: Already tz-aware, use tz_convert to convert.
+ERROR 2025-01-21 13:45:34,525 basehttp "GET /home/ HTTP/1.1" 500 148092
+ERROR 2025-01-21 13:45:36,647 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 29, in process_calendar_data
+    df_usd['Datetime'] = df_usd['Datetime'].dt.tz_localize(new_york_tz)
+                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\accessor.py", line 112, in f
+    return self._delegate_method(name, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\accessors.py", line 132, in _delegate_method
+    result = method(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\datetimes.py", line 293, in tz_localize
+    arr = self._data.tz_localize(tz, ambiguous, nonexistent)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\arrays\_mixins.py", line 81, in method
+    return meth(self, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\arrays\datetimes.py", line 1083, in tz_localize
+    raise TypeError("Already tz-aware, use tz_convert to convert.")
+TypeError: Already tz-aware, use tz_convert to convert.
+ERROR 2025-01-21 13:45:36,650 basehttp "GET /home/ HTTP/1.1" 500 148220
+ERROR 2025-01-21 13:51:34,404 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'Date'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 26, in process_calendar_data
+    data['Datetime'] = pd.to_datetime(data['Date'] + ' ' + data['Time'], format='%m-%d-%Y %I:%M%p').apply(
+                                      ~~~~^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'Date'
+ERROR 2025-01-21 13:51:34,415 basehttp "GET /home/ HTTP/1.1" 500 130367
+ERROR 2025-01-21 13:52:31,244 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 30, in process_calendar_data
+    data['EventEnd'] = data['date'].apply(lambda x: x + timedelta(minutes=5))
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\series.py", line 4924, in apply
+    ).apply()
+      ~~~~~^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\apply.py", line 1427, in apply
+    return self.apply_standard()
+           ~~~~~~~~~~~~~~~~~~~^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\apply.py", line 1507, in apply_standard
+    mapped = obj._map_values(
+        mapper=curried, na_action=action, convert=self.convert_dtype
+    )
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\base.py", line 921, in _map_values
+    return algorithms.map_array(arr, mapper, na_action=na_action, convert=convert)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\algorithms.py", line 1743, in map_array
+    return lib.map_infer(values, mapper, convert=convert)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "lib.pyx", line 2972, in pandas._libs.lib.map_infer
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 30, in <lambda>
+    data['EventEnd'] = data['date'].apply(lambda x: x + timedelta(minutes=5))
+                                                    ~~^~~~~~~~~~~~~~~~~~~~~~
+TypeError: can only concatenate str (not "datetime.timedelta") to str
+ERROR 2025-01-21 13:52:31,251 basehttp "GET /home/ HTTP/1.1" 500 141958
+ERROR 2025-01-21 13:55:01,545 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 25, in process_calendar_data
+    data['Datetime'] = data['Datetime'].dt.tz_localize(new_york_tz)
+                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\accessor.py", line 112, in f
+    return self._delegate_method(name, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\accessors.py", line 132, in _delegate_method
+    result = method(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\datetimes.py", line 293, in tz_localize
+    arr = self._data.tz_localize(tz, ambiguous, nonexistent)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\arrays\_mixins.py", line 81, in method
+    return meth(self, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\arrays\datetimes.py", line 1083, in tz_localize
+    raise TypeError("Already tz-aware, use tz_convert to convert.")
+TypeError: Already tz-aware, use tz_convert to convert.
+ERROR 2025-01-21 13:55:01,550 basehttp "GET /home/ HTTP/1.1" 500 139262
+ERROR 2025-01-21 13:56:47,420 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 974, in json
+    return complexjson.loads(self.text, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 16, in process_calendar_data
+    data = download_file_respecting_rate_limit()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 11, in download_file_respecting_rate_limit
+    data = response.json()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 978, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+ERROR 2025-01-21 13:56:47,424 basehttp "GET /home/ HTTP/1.1" 500 154308
+ERROR 2025-01-21 13:57:47,251 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 30, in process_calendar_data
+    return data[['Datetime', 'EventStart', 'EventEnd', 'Title', 'country', 'Impact']]
+           ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\frame.py", line 4108, in __getitem__
+    indexer = self.columns._get_indexer_strict(key, "columns")[1]
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\base.py", line 6200, in _get_indexer_strict
+    self._raise_if_missing(keyarr, indexer, axis_name)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\base.py", line 6252, in _raise_if_missing
+    raise KeyError(f"{not_found} not in index")
+KeyError: "['Title', 'Impact'] not in index"
+ERROR 2025-01-21 13:57:47,256 basehttp "GET /home/ HTTP/1.1" 500 128800
+ERROR 2025-01-21 13:58:09,806 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 974, in json
+    return complexjson.loads(self.text, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 16, in process_calendar_data
+    data = download_file_respecting_rate_limit()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 11, in download_file_respecting_rate_limit
+    data = response.json()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 978, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+ERROR 2025-01-21 13:58:09,813 basehttp "GET /home/ HTTP/1.1" 500 154308
+ERROR 2025-01-21 13:59:12,657 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 974, in json
+    return complexjson.loads(self.text, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 16, in process_calendar_data
+    data = download_file_respecting_rate_limit()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 11, in download_file_respecting_rate_limit
+    data = response.json()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 978, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+ERROR 2025-01-21 13:59:12,661 basehttp "GET /home/ HTTP/1.1" 500 154324
+ERROR 2025-01-21 14:00:33,080 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 974, in json
+    return complexjson.loads(self.text, **kwargs)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "C:\Python313\Lib\json\decoder.py", line 345, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python313\Lib\json\decoder.py", line 363, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 250, in get_store_calender_data
+    calender_dataa = process_calendar_data()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 16, in process_calendar_data
+    data = download_file_respecting_rate_limit()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\weekly_calender.py", line 11, in download_file_respecting_rate_limit
+    data = response.json()
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\requests\models.py", line 978, in json
+    raise RequestsJSONDecodeError(e.msg, e.doc, e.pos)
+requests.exceptions.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+ERROR 2025-01-21 14:00:33,084 basehttp "GET /home/ HTTP/1.1" 500 154336
+ERROR 2025-01-21 14:04:35,020 log Internal Server Error: /home/
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'Title'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\core\handlers\base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\django\views\generic\base.py", line 104, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\rest_framework\decorators.py", line 50, in handler
+    return func(*args, **kwargs)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 263, in home
+    get_store_calender_data(request)
+    ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\userside\views.py", line 255, in get_store_calender_data
+    calender_data.objects.create(Datetimee=list(calender_dataa['Datetime'])[x],Event_Start=list(calender_dataa['EventStart'])[x],Event_End=list(calender_dataa['EventEnd'])[x],title=list(calender_dataa['Title'])[x],country=list(calender_dataa['Country'])[x],impact=list(calender_dataa['Impact'])[x])
+                                                                                                                                                                                          ~~~~~~~~~~~~~~^^^^^^^^^
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "T:\quantified_ante\quantified_ante_django\quantifiedante\myenv\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 'Title'
+ERROR 2025-01-21 14:04:35,025 basehttp "GET /home/ HTTP/1.1" 500 127720

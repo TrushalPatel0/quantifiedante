@@ -18,7 +18,9 @@ from userside.tradovate_functionalities import *
 from quantifiedante.celery import add
 from userside.tasks import *
 from django.shortcuts import get_object_or_404
-# from userside.weekly_calender import *
+from userside.weekly_calender import *
+
+
 # from userside.bracket_order import connect_tradovate,TradovateSocket
 import time
 
@@ -40,6 +42,33 @@ FrontEnd = 'http://predictive.quantifiedante.com'
 # FrontEnd = 'http://localhost:3000'
     # auth_url = f"{AUTH_URL}?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}"
 
+
+def utc_to_newtork(datee):
+    new_york_tz = pytz.timezone('America/New_York')
+    utc_datetime = datee.replace(tzinfo=pytz.utc)
+    new_york_time = utc_datetime.astimezone(new_york_tz)
+    return new_york_time
+  
+
+
+
+def check_calender_data(request):
+    current_time = timezone.now()
+    print("=========================",current_time)
+    cal_data = calender_data.objects.filter(Event_Start__lt=current_time, Event_End__gt=current_time)
+    current_event = {}
+    for x in cal_data:
+        print('cal datttta',x)
+        current_event.update({'event_name':x.title,'impact':x.impact,'Event_End': utc_to_newtork(x.Event_End).strftime("%Y-%m-%d %H:%M:%S"),'endtime': utc_to_newtork(x.Event_End).strftime("%H:%M")})
+    
+    cal_data_count = calender_data.objects.filter(Event_Start__lt=current_time, Event_End__gt=current_time).count()
+    if cal_data_count>0:
+        current_event.update({'events':cal_data_count})
+        return current_event
+    else:
+        current_event.update({'events':cal_data_count})
+        return current_event
+   
 
 
 # Create a new user account
@@ -235,17 +264,13 @@ def user_change_password(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+
+
+
 @api_view(['GET'])
 def home(request):
     user_id = request.GET.get('user_id')
     context ={}
-    # calender_dataa = process_calendar_data()
-    # print(len(calender_dataa['Datetime']))
-    # print(calender_dataa['Datetime'])
-    # context.update({'cal':list(calender_dataa['Datetime'])[0]})
-    # for x in range(0,len(calender_dataa['Datetime'])):
-    #     calender_data.objects.create(Datetimee=list(calender_dataa['Datetime'])[x],Event_Start=list(calender_dataa['EventStart'])[x],Event_End=list(calender_dataa['EventEnd'])[x],title=list(calender_dataa['Title'])[x],country=list(calender_dataa['Country'])[x],impact=list(calender_dataa['Impact'])[x])
-    
     print(request.GET.get('broker_logout'))
     if user_id:
         user_instance = Userdata.objects.get(user_id=user_id)
@@ -262,6 +287,16 @@ def home(request):
         user_data = {'user_id':user_instance.user_id, 'user_name':user_instance.user_name, 'user_email':user_instance.user_email,'user_passphrase':user_instance.user_passphrase,'user_tradingview_url':user_instance.user_tradingview_url,'user_signal_on':user_instance.user_signal_on}
         context.update({'userdata':user_data})
         print(context)
+    
+    # ==================calendar things=================
+    current_time = timezone.now()
+    for x in calender_data.objects.all():
+        print(x.Datetimee)    
+    print('==========calenderdata')
+    calenderr = check_calender_data(request)
+    print(calenderr)
+    if calenderr['events']>0:
+        context.update({'calender_event':calenderr})
     return Response(context)
 
 def trade_execution(request,user_id_from_webhook):
@@ -273,7 +308,7 @@ def trade_execution(request,user_id_from_webhook):
     userpreference = User_Preference.objects.filter(user_id=user_instance)
 
     account_info = get_accounts(token_data.access_token)  # HTTP call
-    print(account_info)
+    print("========================",account_info)
     current_account = {'acc_id':None, 'acc_name':None}
     for x in account_info:
         if userpreference:
@@ -300,9 +335,13 @@ response_id = []
 def trading_view_signal_webhook_listener(request):
     user_id_from_url = 4
     user_id_from_webhook = request.GET.get('user_id')
-    # current_time = timezone.now()
-    # for x in calender_data.objects.all():
-    #     print(x.Datetimee)    
+    current_time = timezone.now()
+    for x in calender_data.objects.all():
+        print(x.Datetimee)    
+    print('==========calenderdata')
+    calenderr = check_calender_data(request)
+    if calenderr['events']>0:
+        return JsonResponse({'message':'Trading Halted: The current trading session is temporarily halted. It will be resume after 15 mins.'})
     user_instance = Userdata.objects.get(user_id=user_id_from_webhook)
     if user_instance.user_signal_on == True:
         if request.body:
@@ -655,10 +694,22 @@ def user_preference_insert_update(request):
         new_preference.save()
         return JsonResponse({"message": "Preference created successfully."}, status=status.HTTP_201_CREATED)
 
+from time import strftime
+import pytz
+from datetime import datetime   
 
-   
-    
-   
+@api_view(['GET'])
+def show_current_calender(request):
+    data = calender_data.objects.all().values('title', 'country', 'impact', 'Datetimee')
+
+    for x in data:
+        # Convert the 'Datetimee' field from string to datetime if necessary
+        # Assuming 'Datetimee' is a naive datetime
+        new_york_time = utc_to_newtork(x['Datetimee'])
+        x['Datetimee'] = new_york_time.strftime("%Y-%m-%d %H:%M:%S")  # Format the datetime
+
+    context = {'data': list(data)}  # Convert QuerySet to list for serialization
+    return Response(context)
 
     
 

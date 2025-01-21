@@ -6,6 +6,8 @@ from userside.models import *
 import requests
 from django.utils import timezone
 from datetime import timedelta,datetime
+from userside.weekly_calender import *
+from userside.tradovate_functionalities import *
 
 @shared_task
 def sub():
@@ -29,9 +31,8 @@ def renew_access_token():
                 'Authorization': f"Bearer {token_data.access_token}"
             }
             current_time = timezone.now()  # Set to the specified date
-            
-            access_token_data = Access_Token.objects.get(user_id = x)
-            expiration_time = access_token_data.expiry_at
+
+            expiration_time = token_data.expiry_at
 
             if current_time < expiration_time:
                 response = requests.get(url, headers=headers)
@@ -46,5 +47,46 @@ def renew_access_token():
     return 1
 
 
+
+# ===================================setup calendar things======================================================
+
+
+    
+@shared_task
+def get_store_calender_data():
+    calender_dataa = process_calendar_data()
+    print(calender_dataa)
+    print(len(calender_dataa['Datetime']))
+    print(calender_dataa['Datetime'])
+    calender_data.objects.all().delete()
+    for x in range(0,len(calender_dataa['Datetime'])):
+        calender_data.objects.create(Datetimee=list(calender_dataa['Datetime'])[x],Event_Start=list(calender_dataa['EventStart'])[x],Event_End=list(calender_dataa['EventEnd'])[x],title=list(calender_dataa['title'])[x],country=list(calender_dataa['country'])[x],impact=list(calender_dataa['impact'])[x])
+    context = {'message':'success'}
+# ===================================setup calendar things======================================================
+
+
+@shared_task
+def on_event_end_trade():
+    current_time = timezone.now()
+    cal_data_count = calender_data.objects.filter(Event_Start__lt=current_time, Event_End__gt=current_time).count()
+    if cal_data_count>0:
+        access_tokenn = Access_Token.objects.all()
+        for x in access_tokenn:
+            if current_time < x.expiry_at:
+                position = get_position(x.access_token)
+                if position[0]['netPos'] != 0:
+                    liquidate_position(x.access_token, position[0]['accountId'], position[0]['contractId'],False,None)
+
+    
+
+
+
+
+
+
 # celery -A quantifiedante worker --loglevel=info
-# elery -A quantifiedante beat --loglevel=info
+# celery -A quantifiedante beat --loglevel=info
+# supervisorctl status
+# supervisorctl restart all
+
+

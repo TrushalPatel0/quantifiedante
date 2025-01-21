@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -128,9 +128,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -152,7 +153,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Celery Configuration Options
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
-CELERY_TIMEZONE = "Asia/Kolkata"
+CELERY_TIMEZONE = "UTC"
 # CELERY_TASK_TRACK_STARTED = True
 # CELERY_TASK_TIME_LIMIT = 30 * 60
 
@@ -184,18 +185,37 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 
+
 # LOGGING = {
 #     'version': 1,
-#     'disable_existing_loggers': False,
+#     'disable_existing_loggers': False,  # Keeps the default Django loggers enabled
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         },
+#     },
 #     'handlers': {
+#         'file': {
+#             'level': 'ERROR',  # Logs errors and above (ERROR, CRITICAL)
+#             'class': 'logging.FileHandler',
+#             'filename': os.path.join(BASE_DIR, 'logs', 'errors.log'),
+#             'formatter': 'verbose',
+#         },
 #         'console': {
 #             'class': 'logging.StreamHandler',
+#             'formatter': 'simple',
 #         },
 #     },
 #     'loggers': {
-#         'django.db.backends': {
-#             'handlers': ['console'],
-#             'level': 'DEBUG',
+#         'django': {
+#             'handlers': ['file', 'console'],
+#             'level': 'ERROR',  # Minimum level to capture
+#             'propagate': True,  # Pass logs to parent loggers
 #         },
 #     },
 # }
