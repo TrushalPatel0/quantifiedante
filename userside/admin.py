@@ -8,4 +8,5 @@ admin.site.register(User_Preference)
 admin.site.register(Access_Token)
 admin.site.register(multiple_take_profit_orders)
 admin.site.register(calender_data)
+admin.site.register(calender_impact_selection)
 

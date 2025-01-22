@@ -47,7 +47,6 @@ def get_position(access_token):
 
 
 
-
 def get_order_history(access_token):
     headers={'Authorization': f"Bearer {access_token}"} 
     response = requests.get(f"{URL}/fill/list", headers=headers)

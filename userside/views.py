@@ -19,11 +19,9 @@ from quantifiedante.celery import add
 from userside.tasks import *
 from django.shortcuts import get_object_or_404
 from userside.weekly_calender import *
-
-
-# from userside.bracket_order import connect_tradovate,TradovateSocket
+import asyncio
+from userside.bracket_order import tradovate_bracketOrder_socket
 import time
-
 
 
 CLIENT_ID =  4788 
@@ -337,8 +335,7 @@ def trading_view_signal_webhook_listener(request):
     user_id_from_webhook = request.GET.get('user_id')
     current_time = timezone.now()
     for x in calender_data.objects.all():
-        print(x.Datetimee)    
-    print('==========calenderdata')
+        pass
     calenderr = check_calender_data(request)
     if calenderr['events']>0:
         return JsonResponse({'message':'Trading Halted: The current trading session is temporarily halted. It will be resume after 15 mins.'})
@@ -346,8 +343,6 @@ def trading_view_signal_webhook_listener(request):
     if user_instance.user_signal_on == True:
         if request.body:
             webhook_message = json.loads(request.body)
-
-            print("Webhook message:", webhook_message)
             user_passphrase_data = Userdata.objects.get(user_passphrase = webhook_message['passphrase'])
 
             if not user_passphrase_data:
@@ -468,45 +463,59 @@ def trading_view_signal_webhook_listener(request):
                 print(order_id.order_id)
                 if order_id:
                     modify_sl2 = modify_order(data['access_token'], int(order_id.order_id), orderQty=1, orderType="Stop", stopPrice=float(trading_signal['slLine']))
-                
-            # elif order_type == 'Bracket_Order' and action['action'] == "Buy":
-            #     # Order Parameters
-            #     params = {
-            #         "entryVersion": {
-            #             "orderQty": 1,
-            #             "orderType": "Market"
-            #         },
-            #         "brackets": [{
-            #             "qty": 1,
-            #             "profitTarget": -30,
-            #             "stopLoss": 15,
-            #             "trailingStop": False
-            #       }]
-            #     }
-            #     socket, account_id, account_spec = connect_tradovate(request, data['access_token'])
-            #     order = socket.send_order(account_id, account_spec, symbol, "Buy",params)
-            #     print(order)
 
-            # elif order_type == 'Bracket_Order' and action['action'] == "Sell":
-            #     print('enterrr')
-            #     params = {
-            #         "entryVersion": {
-            #             "orderQty": 1,
-            #             "orderType": "Market"
-            #         },
-            #         "brackets": [{
-            #             "qty": 1,
-            #             "profitTarget": -30,
-            #             "stopLoss": 15,
-            #             "trailingStop": False
-            #       }]
-            #     }
+            elif order_type == 'Bracket_Order' and action['action'] == "Sell": 
+                tp1 = float(trading_signal['tp1Line'])
+                entry_price = float(trading_signal['entry_price'])
+                print("=========EntryPrice", entry_price)
+                print("=========tp1", tp1)
+                profitTarget = entry_price-tp1
+                print('=============================',profitTarget)
+                # float(trading_signal['slLine']
+                paramss = {
+                    "entryVersion": {
+                        "orderQty": 3,
+                        "orderType": "Market"
+                    },
+                    "brackets": [{
+                        "qty": 3,
+                        "profitTarget": -1*profitTarget,
+                        "stopLoss": 1*profitTarget,
+                        "trailingStop": False,
+                        "autoTrail": {
+                            'stopLoss':20,
+                            'trigger':20,
+                            'freq':20
+                        }
+                    }]
+                }
+                asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action']))
 
-            #     socket = TradovateSocket()
-            #     socket, account_id, account_spec = connect_tradovate(request, data['access_token'])
-            #     order = socket.send_order(account_id, account_spec, symbol, "Sell", params)
-            #     print(order)
+            elif order_type == 'Bracket_Order' and action['action'] == "Buy":
+                tp1 = float(trading_signal['tp1Line'])
+                entry_price = float(trading_signal['entry_price'])
+                profitTarget = entry_price-tp1
+                # float(trading_signal['slLine']
 
+                paramss = {
+                    "entryVersion": {
+                        "orderQty": 3,
+                        "orderType": "Market"
+                    },
+                    "brackets": [{
+                        "qty": 3,
+                        "profitTarget": -1*profitTarget,
+                        "stopLoss": 1*profitTarget,
+                        "trailingStop": False,
+                        "autoTrail": {
+                            'stopLoss':20,
+                            'trigger':20,
+                            'freq':20
+                        }
+                    }]
+                }
+                asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action']))
+           
 
             return JsonResponse(data, safe=False)
         else:
@@ -711,10 +720,24 @@ def show_current_calender(request):
     context = {'data': list(data)}  # Convert QuerySet to list for serialization
     return Response(context)
 
+
+
     
 
 
-
+@api_view(['GET'])
+def liquidate_positions(request):
+    user_id = request.GET.get('user_id')
+    if user_id:
+        user_instance = Userdata.objects.get(user_id=user_id)
+        token_data = Access_Token.objects.get(user_id=user_instance)
+        position = get_position(token_data.access_token)
+    
+    if position[0]['netPos'] != 0:
+        liquidate_position(token_data.access_token, position[0]['accountId'], position[0]['contractId'],False,None)
+        return Response({'message':'Success','status':True})
+    return Response({'message':'No Position','status':False})
+    
 
 
 

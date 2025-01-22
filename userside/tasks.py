@@ -68,14 +68,30 @@ def get_store_calender_data():
 @shared_task
 def on_event_end_trade():
     current_time = timezone.now()
-    cal_data_count = calender_data.objects.filter(Event_Start__lt=current_time, Event_End__gt=current_time).count()
-    if cal_data_count>0:
-        access_tokenn = Access_Token.objects.all()
-        for x in access_tokenn:
-            if current_time < x.expiry_at:
-                position = get_position(x.access_token)
-                if position[0]['netPos'] != 0:
-                    liquidate_position(x.access_token, position[0]['accountId'], position[0]['contractId'],False,None)
+    cal_data_count = calender_data.objects.filter(Event_Start__lt=current_time, Event_End__gt=current_time)
+    counter = 0
+    for y in calender_impact_selection.objects.all():
+        if y.Holiday==True:
+            cal_data_count = cal_data_count.filter(impact = 'Holiday')
+            counter=counter+1
+        if y.Low==True:
+            cal_data_count = cal_data_count.filter(impact = 'Low')
+            counter = counter+1
+        if y.High==True:
+            cal_data_count = cal_data_count.filter(impact = 'High')
+            counter = counter+1
+        if y.Medium==True:
+            cal_data_count = cal_data_count.filter(impact = 'Medium')
+            counter = counter+1
+        cal_data_count = cal_data_count.count()
+
+        if (cal_data_count>0 and counter!=0):
+            access_tokenn = Access_Token.objects.all()
+            for x in access_tokenn:
+                if current_time < x.expiry_at:
+                    position = get_position(x.access_token)
+                    if position[0]['netPos'] != 0:
+                        liquidate_position(x.access_token, position[0]['accountId'], position[0]['contractId'],False,None)
 
     
 

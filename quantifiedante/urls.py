@@ -35,6 +35,7 @@ urlpatterns = [
     path('preferences/', views.preferences, name='preferences'),
     path('user_preference_insert_update/', views.user_preference_insert_update, name='user_preference_insert_update'),
     path('show_current_calender/', views.show_current_calender, name='show_current_calender'),
+    path('liquidate_positions/', views.liquidate_positions, name='liquidate_positions'),
     
 ]
 

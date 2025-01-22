@@ -98,3 +98,20 @@ class calender_data(models.Model):
 
     class Meta:
         db_table = 'calender_data'
+
+
+
+class calender_impact_selection(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user_id = models.ForeignKey(Userdata, on_delete=models.CASCADE)
+    Holiday =  models.BooleanField(default=1, null=True, blank=True)
+    Low = models.BooleanField(default=1, null=True, blank=True)
+    High = models.BooleanField(default=1, null=True, blank=True)
+    Medium = models.BooleanField(default=1, null=True, blank=True)
+    
+
+    def _str_(self):
+        return self.user_id.user_email
+
+    class Meta:
+        db_table = 'calender_impact_selection'

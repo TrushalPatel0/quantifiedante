@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +41,7 @@ INSTALLED_APPS = [
     'userside',
     'django_celery_beat',
     'corsheaders',
-    'rest_framework',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -73,6 +74,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'quantifiedante.wsgi.application'
+
+
+# quantifiedante/settings.py
+# ASGI_APPLICATION = 'quantifiedante.asgi.application'
+
+
 
 
 # Database
@@ -110,6 +117,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+
 
 
 # Internationalization
