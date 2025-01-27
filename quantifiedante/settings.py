@@ -77,7 +77,7 @@ WSGI_APPLICATION = 'quantifiedante.wsgi.application'
 
 
 # quantifiedante/settings.py
-# ASGI_APPLICATION = 'quantifiedante.asgi.application'
+ASGI_APPLICATION = 'quantifiedante.asgi.application'
 
 
 
@@ -88,12 +88,12 @@ WSGI_APPLICATION = 'quantifiedante.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'predictivequantifiedante',
         'USER': 'predictivequantifiedante',
-        'PASSWORD': '71554913@TmP@',
-        'HOST': '44.222.204.134',
-        'PORT': '3306',
+        'PASSWORD': '1billion$goal!',
+        'HOST': 'localhost',
+        'PORT': '',
         'CONN_MAX_AGE': 6000,
     }
 }
@@ -164,8 +164,24 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # Celery Configuration Options
 CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
 CELERY_TIMEZONE = "UTC"
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# Task serialization
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Celery timezone configuration
+CELERY_TIMEZONE = 'UTC'
+CELERY_ENABLE_UTC = True
 # CELERY_TASK_TRACK_STARTED = True
 # CELERY_TASK_TIME_LIMIT = 30 * 60
+
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://predictiveapi.quantifiedante.com',
+]
 
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -196,36 +212,60 @@ CORS_ALLOW_CREDENTIALS = True
 
 
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,  # Keeps the default Django loggers enabled
-#     'formatters': {
-#         'verbose': {
-#             'format': '{levelname} {asctime} {module} {message}',
-#             'style': '{',
-#         },
-#         'simple': {
-#             'format': '{levelname} {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'file': {
-#             'level': 'ERROR',  # Logs errors and above (ERROR, CRITICAL)
-#             'class': 'logging.FileHandler',
-#             'filename': os.path.join(BASE_DIR, 'logs', 'errors.log'),
-#             'formatter': 'verbose',
-#         },
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'simple',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file', 'console'],
-#             'level': 'ERROR',  # Minimum level to capture
-#             'propagate': True,  # Pass logs to parent loggers
-#         },
-#     },
-# }
+import os
+import logging
+import sys
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'logss.log'),
+            'formatter': 'verbose',
+        },
+        'model_file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'success_failure_trades.log'),  # Log file for models
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+         'django.success_failure_trades': {  # New logger for success/failure of trades
+            'handlers': ['model_file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
+# Redirect stdout and stderr to log file
+class StreamToLogger(object):
+    def __init__(self, logger_name, level):
+        self.logger = logging.getLogger(logger_name)
+        self.level = level
+
+    def write(self, message):
+        if message.strip():  # Skip empty messages
+            self.logger.log(self.level, message)
+
+    def flush(self):
+        pass
+
+# Set up stdout and stderr redirection
+# sys.stdout = StreamToLogger('django', logging.INFO)
+# sys.stderr = StreamToLogger('django', logging.ERROR)

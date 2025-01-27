@@ -20,8 +20,13 @@ from userside.tasks import *
 from django.shortcuts import get_object_or_404
 from userside.weekly_calender import *
 import asyncio
-from userside.bracket_order import tradovate_bracketOrder_socket
+from userside.bracket_order import *
 import time
+from asgiref.sync import async_to_sync
+
+import logging
+logger_trades = logging.getLogger('django.success_failure_trades')
+
 
 
 CLIENT_ID =  4788 
@@ -269,7 +274,6 @@ def user_change_password(request):
 def home(request):
     user_id = request.GET.get('user_id')
     context ={}
-    print(request.GET.get('broker_logout'))
     if user_id:
         user_instance = Userdata.objects.get(user_id=user_id)
         current_time = timezone.now()
@@ -284,15 +288,11 @@ def home(request):
             context.update({'token':token_data.access_token})
         user_data = {'user_id':user_instance.user_id, 'user_name':user_instance.user_name, 'user_email':user_instance.user_email,'user_passphrase':user_instance.user_passphrase,'user_tradingview_url':user_instance.user_tradingview_url,'user_signal_on':user_instance.user_signal_on}
         context.update({'userdata':user_data})
-        print(context)
     
     # ==================calendar things=================
     current_time = timezone.now()
-    for x in calender_data.objects.all():
-        print(x.Datetimee)    
-    print('==========calenderdata')
+   
     calenderr = check_calender_data(request)
-    print(calenderr)
     if calenderr['events']>0:
         context.update({'calender_event':calenderr})
     return Response(context)
@@ -303,14 +303,14 @@ def trade_execution(request,user_id_from_webhook):
         user_instance = Userdata.objects.get(user_id=user_id)
         token_data = Access_Token.objects.get(user_id=user_instance)
     
-    userpreference = User_Preference.objects.filter(user_id=user_instance)
+    userpreference = User_Preference.objects.get(user_id=user_instance)
 
     account_info = get_accounts(token_data.access_token)  # HTTP call
     print("========================",account_info)
     current_account = {'acc_id':None, 'acc_name':None}
     for x in account_info:
         if userpreference:
-           if x['id'] == int(userpreference[0].account):
+           if x['id'] == int(userpreference.account):
                current_account.update({'acc_id':x['id'], 'acc_name':x['name']})
     
     account_spec = account_info[0]['name']
@@ -331,13 +331,13 @@ def trade_execution(request,user_id_from_webhook):
 response_id = []
 @api_view(['POST','GET'])
 def trading_view_signal_webhook_listener(request):
-    user_id_from_url = 4
+    user_id_from_url = 1
     user_id_from_webhook = request.GET.get('user_id')
     current_time = timezone.now()
     for x in calender_data.objects.all():
         pass
     calenderr = check_calender_data(request)
-    if calenderr['events']>0:
+    if calenderr['events']<0:
         return JsonResponse({'message':'Trading Halted: The current trading session is temporarily halted. It will be resume after 15 mins.'})
     user_instance = Userdata.objects.get(user_id=user_id_from_webhook)
     if user_instance.user_signal_on == True:
@@ -359,6 +359,7 @@ def trading_view_signal_webhook_listener(request):
                 "slLine": webhook_message["slLine"],
                 "entry_price": webhook_message["entry price"],
             }
+            logger_trades.info("trading_signal =>",trading_signal)
             symbol = webhook_message["ticker"]
             symbol = convert_ticker(symbol)
             order_price = None
@@ -474,11 +475,11 @@ def trading_view_signal_webhook_listener(request):
                 # float(trading_signal['slLine']
                 paramss = {
                     "entryVersion": {
-                        "orderQty": 3,
+                        "orderQty": 1,
                         "orderType": "Market"
                     },
                     "brackets": [{
-                        "qty": 3,
+                        "qty": 1,
                         "profitTarget": -1*profitTarget,
                         "stopLoss": 1*profitTarget,
                         "trailingStop": False,
@@ -489,23 +490,37 @@ def trading_view_signal_webhook_listener(request):
                         }
                     }]
                 }
-                asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action']))
+                print("=========",paramss)
+                logger_trades.info("params =>",paramss)
+
+
+                position = get_position(data['access_token'])
+                for x in position:
+                    if x['accountId'] == data['account_id']:
+                        if x['netPos'] != 0:
+                            liquidate_position(data['access_token'], x['accountId'], x['contractId'],False,None)
+                time.sleep(1)
+                asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action'],data['account_id'], data['account_spec']))
 
             elif order_type == 'Bracket_Order' and action['action'] == "Buy":
+                print("======entering")
                 tp1 = float(trading_signal['tp1Line'])
                 entry_price = float(trading_signal['entry_price'])
                 profitTarget = entry_price-tp1
                 # float(trading_signal['slLine']
+                print('profitt:{}========entry:{}========{}'.format(-1*profitTarget,entry_price,1*profitTarget))
 
                 paramss = {
                     "entryVersion": {
-                        "orderQty": 3,
+                        "orderQty": 1,
                         "orderType": "Market"
                     },
                     "brackets": [{
-                        "qty": 3,
+                        "qty": 1,
                         "profitTarget": -1*profitTarget,
                         "stopLoss": 1*profitTarget,
+                        # "profitTarget": 25,
+                        # "stopLoss": -25,
                         "trailingStop": False,
                         "autoTrail": {
                             'stopLoss':20,
@@ -514,14 +529,23 @@ def trading_view_signal_webhook_listener(request):
                         }
                     }]
                 }
-                asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action']))
-           
 
+                logger_trades.info("params =>",paramss)
+
+                print('params:',paramss)
+                position = get_position(data['access_token'])
+                for x in position:
+                    if x['accountId'] == data['account_id']:
+                        if x['netPos'] != 0:
+                            liquidate_position(data['access_token'], x['accountId'], x['contractId'],False,None)
+                time.sleep(1)
+                asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action'], data['account_id'], data['account_spec']))
+                
             return JsonResponse(data, safe=False)
         else:
             return JsonResponse({'message':'outof body'})
     else:
-        return JsonResponse({'message':'Trade is Not On, Please on Trade.'})
+        return JsonResponse({'message':'Trade is Not On, Please on Trade.'})    
 
 
 
@@ -548,8 +572,9 @@ def trade_signal_update(request):
 
 
 def callback(request):
-    user_id=4
+    user_id=1
     if user_id:
+        print("user id ====================",user_id)
         user_instance = Userdata.objects.get(user_id = user_id)
     code = request.GET.get("code")
     renew_access_token = request.GET.get('renew_access_token')
@@ -732,9 +757,12 @@ def liquidate_positions(request):
         user_instance = Userdata.objects.get(user_id=user_id)
         token_data = Access_Token.objects.get(user_id=user_instance)
         position = get_position(token_data.access_token)
-    
-    if position[0]['netPos'] != 0:
-        liquidate_position(token_data.access_token, position[0]['accountId'], position[0]['contractId'],False,None)
+
+        userpreference = User_Preference.objects.get(user_id=user_instance)
+        for x in position:
+            if x['accountId'] == userpreference.account:
+                if x['netPos'] != 0:
+                    liquidate_position(token_data.access_token, x['accountId'], x['contractId'],False,None)
         return Response({'message':'Success','status':True})
     return Response({'message':'No Position','status':False})
     
