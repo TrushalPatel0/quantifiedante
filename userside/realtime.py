@@ -11,21 +11,12 @@ MD_URL = 'wss://md.tradovateapi.com/v1/websocket'
 WS_DEMO_URL = 'wss://demo.tradovateapi.com/v1/websocket'
 WS_LIVE_URL = 'wss://live.tradovateapi.com/v1/websocket'
 
-credentials = {
-    "name":       "Your credentials here",
-    "password":   "Your credentials here",
-    "appId":      "Sample App",
-    "appVersion": "1.0",
-    "cid":        0,
-    "sec":        'Your API secret here'
-}
-
+# No need for credentials since we're using a direct access token
 
 # --- Utilities ---
 async def wait_for_ms(ms: int):
     """Asynchronously waits for a specified number of milliseconds."""
     await asyncio.sleep(ms / 1000)
-
 
 # --- Storage ---
 class SessionStorage:
@@ -42,16 +33,13 @@ class SessionStorage:
          """Sets or updates the value in storage"""
          SessionStorage._storage[key] = value
 
-
 def get_user_data():
     """Retrieves user data from session storage"""
     return SessionStorage.get_item('tradovate-user-data') or {}
 
-
 def set_user_data(value: Dict):
     """Sets user data in session storage"""
     SessionStorage.set_item('tradovate-user-data', value)
-
 
 # --- Services ---
 async def tv_get(endpoint: str, query: Optional[Dict] = None) -> Optional[Dict]:
@@ -125,7 +113,6 @@ class TradovateSocket:
         self.listeners: List[Callable[[Dict], None]] = []
         self.event_listener: Optional[websockets.WebSocketClientProtocol] = None
 
-
     def increment(self):
         """Increments and returns a counter"""
         self.counter += 1
@@ -169,7 +156,6 @@ class TradovateSocket:
                               listener(d)
             except Exception as e:
                 logging.error(f"Connection closed unexpectedly: {e}")
-
 
         async def auth_handler():
             try:
@@ -352,30 +338,20 @@ def prepare_message(raw: str) -> tuple[str, Any]:
     data = json.loads(raw[1:]) if len(raw) > 1 else []
     return T, data
 
-
-# --- Auth ---
-async def get_access_token(url: str, credentials: Dict) -> Dict:
-    """Fetches an access token from the Tradovate API."""
-    auth_response = await tv_post('/auth/accesstokenrequest', credentials, False)
-    logging.info(auth_response)
-    return auth_response
-
 # --- Main ---
 async def main():
     """Main function to run the example."""
     logging.basicConfig(level=logging.DEBUG)
 
-    # 1. Get Access Token and Initialize Socket
-    # user_data = await get_access_token(URL, credentials)
-    # set_user_data(user_data)
+    # 1. Set the access token directly
+    access_token = "IItOoEjHq8pfN460OLzt2P1aBeaTVlfJEYYp_lh-t3hEXP-NA38C2XryJuB1CS3nnpfcF1SFdjI1c4H3Dr0UQ16MkB77gQZouotyf3Dq1-1Z-gLFH5lAFUt-3HCLEq_AYle4iDmexiBhet19LhomxzGb_3o2VxRRlOmJGsuoGkxUmtfljM1o0vVeAVPIFnFet3F8MaFVHKDfntk"
+    set_user_data({'accessToken': access_token})
 
-    # access_token = user_data.get('accessToken')
-    access_token = "EswtJE-1PV2Ay6MRtLWbldRqY3UaDUuB6hWiiEgehOk_-iIDKwF3_j0kJcMazJpFy6EGbQlOFkMtyeaU6Al_G2MkZshdhSSqggJyAOV0WA_wumUx4a5nVkDBiXn43euRbASBD369DHAgUQpuV5uHnwo8O10SZ1jqR8DFiKkgMpnckLrlG71gSaxqfwmUERBAbSGTxMn9Ng0h7MI"
-
+    # 2. Initialize Socket
     quote_socket = TradovateSocket(debug_label='quote data')
     await quote_socket.connect(MD_URL, access_token)
 
-    # 2. Subscription parameters
+    # 3. Subscription parameters
     contract_name = 'MNQH5'  # <--- Specify the contract you want to watch here
 
     async def quote_handler(quote_data: Dict):
@@ -388,7 +364,7 @@ async def main():
         if bid and ask:
             logging.info(f"   Bid: {bid}, Ask: {ask}")
 
-    # 3. Subscribe to Quote Data
+    # 4. Subscribe to Quote Data
     unsubscribe = await quote_socket.subscribe({
         'url': 'md/subscribequote',
         'body': {'symbol': contract_name},
@@ -399,7 +375,7 @@ async def main():
     # Keep the program running to listen for events.
     try:
       while True:
-        await asyncio.sleep(1)  # Keep the program alive to receive updates.
+        await asyncio.sleep(10)  # Keep the program alive to receive updates.
     except asyncio.CancelledError:
         pass
     finally:

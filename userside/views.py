@@ -337,7 +337,7 @@ def trading_view_signal_webhook_listener(request):
     for x in calender_data.objects.all():
         pass
     calenderr = check_calender_data(request)
-    if calenderr['events']<0:
+    if calenderr['events']>0:
         return JsonResponse({'message':'Trading Halted: The current trading session is temporarily halted. It will be resume after 15 mins.'})
     user_instance = Userdata.objects.get(user_id=user_id_from_webhook)
     if user_instance.user_signal_on == True:
@@ -359,7 +359,7 @@ def trading_view_signal_webhook_listener(request):
                 "slLine": webhook_message["slLine"],
                 "entry_price": webhook_message["entry price"],
             }
-            logger_trades.info("trading_signal =>",trading_signal)
+            logger_trades.info("trading_signal =>{}".format(trading_signal))
             symbol = webhook_message["ticker"]
             symbol = convert_ticker(symbol)
             order_price = None
@@ -466,6 +466,7 @@ def trading_view_signal_webhook_listener(request):
                     modify_sl2 = modify_order(data['access_token'], int(order_id.order_id), orderQty=1, orderType="Stop", stopPrice=float(trading_signal['slLine']))
 
             elif order_type == 'Bracket_Order' and action['action'] == "Sell": 
+                logger_trades.info("\n===================================== New Order =============================\n")
                 tp1 = float(trading_signal['tp1Line'])
                 entry_price = float(trading_signal['entry_price'])
                 print("=========EntryPrice", entry_price)
@@ -475,12 +476,12 @@ def trading_view_signal_webhook_listener(request):
                 # float(trading_signal['slLine']
                 paramss = {
                     "entryVersion": {
-                        "orderQty": 1,
+                        "orderQty": 3,
                         "orderType": "Market"
                     },
                     "brackets": [{
-                        "qty": 1,
-                        "profitTarget": -1*profitTarget,
+                        "qty": 3,
+                        # "profitTarget": -1*profitTarget,
                         "stopLoss": 1*profitTarget,
                         "trailingStop": False,
                         "autoTrail": {
@@ -491,19 +492,19 @@ def trading_view_signal_webhook_listener(request):
                     }]
                 }
                 print("=========",paramss)
-                logger_trades.info("params =>",paramss)
-
+                logger_trades.info("params => {}".format(paramss))
 
                 position = get_position(data['access_token'])
                 for x in position:
                     if x['accountId'] == data['account_id']:
                         if x['netPos'] != 0:
                             liquidate_position(data['access_token'], x['accountId'], x['contractId'],False,None)
-                time.sleep(1)
-                asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action'],data['account_id'], data['account_spec']))
-
+                # asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action'],data['account_id'], data['account_spec']))
+                time.sleep(0.7)
+                place_brc_order(paramss,data['access_token'],action['action'], data['account_id'], data['account_spec'], symbol)
             elif order_type == 'Bracket_Order' and action['action'] == "Buy":
                 print("======entering")
+                logger_trades.info("\n===================================== New Order =============================\n")
                 tp1 = float(trading_signal['tp1Line'])
                 entry_price = float(trading_signal['entry_price'])
                 profitTarget = entry_price-tp1
@@ -512,12 +513,12 @@ def trading_view_signal_webhook_listener(request):
 
                 paramss = {
                     "entryVersion": {
-                        "orderQty": 1,
+                        "orderQty": 3,
                         "orderType": "Market"
                     },
                     "brackets": [{
-                        "qty": 1,
-                        "profitTarget": -1*profitTarget,
+                        "qty": 3,
+                        # "profitTarget": -1*profitTarget,
                         "stopLoss": 1*profitTarget,
                         # "profitTarget": 25,
                         # "stopLoss": -25,
@@ -530,7 +531,7 @@ def trading_view_signal_webhook_listener(request):
                     }]
                 }
 
-                logger_trades.info("params =>",paramss)
+                logger_trades.info("params => {}".format(paramss))
 
                 print('params:',paramss)
                 position = get_position(data['access_token'])
@@ -538,8 +539,10 @@ def trading_view_signal_webhook_listener(request):
                     if x['accountId'] == data['account_id']:
                         if x['netPos'] != 0:
                             liquidate_position(data['access_token'], x['accountId'], x['contractId'],False,None)
-                time.sleep(1)
-                asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action'], data['account_id'], data['account_spec']))
+                
+                # asyncio.run(tradovate_bracketOrder_socket(paramss,data['access_token'],action['action'], data['account_id'], data['account_spec']))
+                time.sleep(0.7)
+                place_brc_order(paramss,data['access_token'],action['action'], data['account_id'], data['account_spec'], symbol)
                 
             return JsonResponse(data, safe=False)
         else:

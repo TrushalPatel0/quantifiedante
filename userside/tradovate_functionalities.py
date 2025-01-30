@@ -78,6 +78,48 @@ def place_order(access_token,account_spec,account_id,action,symbol,order_qty,ord
     response.raise_for_status() 
     return response.json()
 
+
+
+
+
+
+def place_brc_order(paramss,access_token,action, account_id, account_spec,symbol):
+
+    params = {
+            "entryVersion": {
+                "orderQty": 1,
+                "orderType": "Market"
+            },
+            "brackets": [{
+                "qty": 1,
+                "profitTarget": -30,
+                "stopLoss": 15,
+                "trailingStop": False
+            }]
+        }
+
+    body = {
+            "accountId": account_id,
+            "accountSpec": account_spec,
+            "symbol": "MNQH5",
+            "action": action,
+            "orderStrategyTypeId": 2,  # 2 is 'multibracket', we currently only offer this strategy but more may exist in the future.
+            "params": json.dumps(paramss)
+        }
+
+
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json",
+    }
+
+    print(f"Placing order with payload: {json.dumps(body)}") 
+
+    response = requests.post(f"https://demo.tradovateapi.com/v1/orderStrategy/startorderstrategy", headers=headers, json=body)
+    print("Response Body:", response.text)
+    response.raise_for_status() 
+    return response.json()
+
 def place_oco_order(access_token, account_spec, account_id, symbol, action, order_qty, stop_price, limit_price):
     print('Enter in oco')
     limit = {"action": action, "orderType": "Stop", "stopPrice": stop_price}

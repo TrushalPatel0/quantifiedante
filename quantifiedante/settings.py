@@ -267,5 +267,5 @@ class StreamToLogger(object):
         pass
 
 # Set up stdout and stderr redirection
-# sys.stdout = StreamToLogger('django', logging.INFO)
-# sys.stderr = StreamToLogger('django', logging.ERROR)
+sys.stdout = StreamToLogger('django', logging.INFO)
+sys.stderr = StreamToLogger('django', logging.ERROR)
