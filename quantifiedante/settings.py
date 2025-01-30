@@ -92,8 +92,8 @@ DATABASES = {
         'NAME': 'predictivequantifiedante',
         'USER': 'predictivequantifiedante',
         'PASSWORD': '1billion$goal!',
-        'HOST': 'localhost',
-        'PORT': '',
+        'HOST': '3.91.52.236',
+        'PORT': '5432',
         'CONN_MAX_AGE': 6000,
     }
 }
@@ -267,5 +267,5 @@ class StreamToLogger(object):
         pass
 
 # Set up stdout and stderr redirection
-sys.stdout = StreamToLogger('django', logging.INFO)
-sys.stderr = StreamToLogger('django', logging.ERROR)
+#sys.stdout = StreamToLogger('django', logging.INFO)
+#sys.stderr = StreamToLogger('django', logging.ERROR)

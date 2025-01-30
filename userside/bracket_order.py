@@ -14,7 +14,6 @@ nest_asyncio.apply()
 # Constants for URLs
 URL = 'wss://demo.tradovateapi.com/v1/websocket'
 REST_URL = 'https://demo.tradovateapi.com/v1'
-MD_URL = 'wss://md.tradovateapi.com/v1/websocket'
 
 class SingletonMeta(type):
     """A metaclass for implementing the Singleton pattern."""
@@ -156,7 +155,7 @@ async def tradovate_bracketOrder_socket(paramss, access_token, action, account_i
     print("this is latest1")
 
     # Use the singleton socket instance
-    await socket.connect(MD_URL, access_token)
+    await socket.connect(URL, access_token)
 
     await socket.send_order(account_id, account_spec, "MNQH5", action, paramss)
     await asyncio.sleep(7)
